@@ -17,7 +17,7 @@ pi1_start	EQU	(2+(2*nb_color))
 
 _v_bas_ad	EQU 	$44e		; screen base address
 
-	section text
+	section text,text
 
 start:
 	pea.l	show
@@ -87,11 +87,11 @@ show:
 	rts
 
 
-	section data
+	section data,data
 
 	even
 myPicture incbin theimage.pi1
 
 
-	section bss
+	section bss,bss
 oldpal	ds.l 8
