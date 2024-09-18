@@ -1,11 +1,9 @@
 all: img.prg
 
 
-img.prg: img.o 
-	vlink -bataritos -o $@ $^
 
-%.o: %.s
-	vasmm68k_mot -Felf -o $@ $^
+img.prg: img.s
+	vasmm68k_mot -Ftos -o $@ $^
 
 clean:
 	rm -f *.prg *.tos *.o
