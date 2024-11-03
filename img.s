@@ -52,11 +52,11 @@ show:
    	lea	12(a7),a7
 
 	; set image palette
-	movem.l	myPicture+pi1_pal,d0-d7
+	movem.l	myBgnd+pi1_pal,d0-d7
 	movem.l	d0-d7,$ffff8240.w
 
 	; transfer image to screen
-	lea	myPicture+pi1_start,a0
+	lea	myBgnd+pi1_start,a0
 	move.l	_v_bas_ad.w,a1
 	
 	move.l	#32000/4-1,d0
@@ -90,7 +90,7 @@ show:
 	section data
 
 	even
-myPicture incbin theimage.pi1
+myBgnd incbin .\Assets\fond.pi1
 
 
 	section bss
