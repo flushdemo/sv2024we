@@ -20,6 +20,7 @@ _v_bas_ad	EQU 	$44e		; screen base address
 	section text
 
 start:
+	dc.w $a00a
 	pea.l	show
 	move.w	#supexec,-(a7)
 	trap	#xbios
@@ -33,7 +34,7 @@ start:
 show:
 	; clean bss palette variable
 	moveq.l	#8-1,d0
-	lea	oldpal(pc),a1
+	lea	oldpal,a1
 	moveq.l	#0,d1
 .cleanpal:
 	move.l	d1,(a1)+
@@ -52,17 +53,126 @@ show:
    	lea	12(a7),a7
 
 	; set image palette
-	movem.l	myBgnd+pi1_pal,d0-d7
+	movem.l	myBgnd+pi1_pal(pc),d0-d7
 	movem.l	d0-d7,$ffff8240.w
 
 	; transfer image to screen
-	lea	myBgnd+pi1_start,a0
+	lea	myBgnd+pi1_start(pc),a0
 	move.l	_v_bas_ad.w,a1
 	
 	move.l	#32000/4-1,d0
-.shw_img:
+.shw_bg:
 	move.l	(a0)+,(a1)+
-	dbf	d0,.shw_img
+	dbf	d0,.shw_bg
+
+	; show gnome frame1 mask
+	lea	myMskFrame0+pi1_start,a0
+	move.l	_v_bas_ad.w,a1
+	lea	16*160(a0),a0
+	lea	16*160(a1),a1
+	move.l #175,d1
+.shw_gnome_msk_frame_0:
+	; 1 block of 16 pixels
+	REPT 4
+	move.l	(a0)+,d0
+	and.l	(a1),d0
+	move.l	d0,(a1)+
+	ENDR
+	; 2 block of 16 pixels
+	REPT 4
+	move.l	(a0)+,d0
+	and.l	(a1),d0
+	move.l	d0,(a1)+
+	ENDR
+	; 3 block of 16 pixels
+	REPT 4
+	move.l	(a0)+,d0
+	and.l	(a1),d0
+	move.l	d0,(a1)+
+	ENDR
+	; 4 block of 16 pixels
+	REPT 4
+	move.l	(a0)+,d0
+	and.l	(a1),d0
+	move.l	d0,(a1)+
+	ENDR
+	; 5 block of 16 pixels
+	REPT 4
+	move.l	(a0)+,d0
+	and.l	(a1),d0
+	move.l	d0,(a1)+
+	ENDR
+	; 6 block of 16 pixels
+	REPT 4
+	move.l	(a0)+,d0
+	and.l	(a1),d0
+	move.l	d0,(a1)+
+	ENDR
+	; 7 block of 16 pixels
+	REPT 4
+	move.l	(a0)+,d0
+	and.l	(a1),d0
+	move.l	d0,(a1)+
+	ENDR
+	add.l	#160-112,a1
+	add.l	#160-112,a0
+	dbf d1,.shw_gnome_msk_frame_0
+	; show gnome frame 0
+
+	; show gnome frame1 mask
+	lea	gnomeFrame0+pi1_start,a0
+	move.l	_v_bas_ad.w,a1
+	lea	16*160(a0),a0
+	lea	16*160(a1),a1
+	move.l #175,d1
+
+.shw_gnome_frame_0:
+	; 1 block of 16 pixels
+	REPT 4
+	move.l	(a0)+,d0
+	or.l	(a1),d0
+	move.l	d0,(a1)+
+	ENDR
+	; 2 block of 16 pixels
+	REPT 4
+	move.l	(a0)+,d0
+	or.l	(a1),d0
+	move.l	d0,(a1)+
+	ENDR
+	; 3 block of 16 pixels
+	REPT 4
+	move.l	(a0)+,d0
+	or.l	(a1),d0
+	move.l	d0,(a1)+
+	ENDR
+	; 4 block of 16 pixels
+	REPT 4
+	move.l	(a0)+,d0
+	or.l	(a1),d0
+	move.l	d0,(a1)+
+	ENDR
+	; 5 block of 16 pixels
+	REPT 4
+	move.l	(a0)+,d0
+	or.l	(a1),d0
+	move.l	d0,(a1)+
+	ENDR
+	; 6 block of 16 pixels
+	REPT 4
+	move.l	(a0)+,d0
+	or.l	(a1),d0
+	move.l	d0,(a1)+
+	ENDR
+	; 7 block of 16 pixels
+	REPT 4
+	move.l	(a0)+,d0
+	or.l	(a1),d0
+	move.l	d0,(a1)+
+	ENDR
+	add.l	#160-112,a1
+	add.l	#160-112,a0
+	dbf d1,.shw_gnome_frame_0
+
 
 	; wait a key press
 	move.w	#ccoin,-(sp)
@@ -91,6 +201,8 @@ show:
 
 	even
 myBgnd incbin .\Assets\fond.pi1
+myMskFrame0	incbin .\Assets\g7msk.pi1
+gnomeFrame0 incbin .\Assets\g7.pi1
 
 
 	section bss
