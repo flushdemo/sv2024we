@@ -26,8 +26,13 @@ _v_bas_ad					EQU 		$44e		; screen base address (idem logbase)
 	section text
 
 start:
+	lea	screen,a0
+	move.l	#(((screen_size_in_bytes*2)+256)/4)-1,d0
+	moveq.l #0,d1
+loop_clr_scr:
+	move.l d1,(a0)+
+	dbf d1,loop_clr_scr
 
-	dc.w $a00a
 
 	pea.l	show
 	move.w	#supexec,-(a7)
@@ -40,7 +45,6 @@ start:
 	lea	4(a7),a7
 	
 show:
-
 backup_pal:
 	; clean bss palette variable
 	moveq.l	#((2*nb_color)/4)-1,d0	; 16 colors (a color requiring 2 bytes (a word))
@@ -90,50 +94,52 @@ set_bg:
 .shw_gnome_msk_frame_0:
 	; 1 block of 16 pixels
 	;movem.l	(a0)+,d2-d4
-	
-	REPT 4
+
+	; get and apply the mask for the first block of 16 pixels
+	; (4 planes) : a long word get 2 planes.
+	REPT 2
 	move.l	(a0)+,d0
 	and.l	(a1),d0
 	move.l	d0,(a1)+
 	ENDR
 	; 2 block of 16 pixels
-	REPT 4
+	REPT 2
 	move.l	(a0)+,d0
 	and.l	(a1),d0
 	move.l	d0,(a1)+
 	ENDR
 	; 3 block of 16 pixels
-	REPT 4
+	REPT 2
 	move.l	(a0)+,d0
 	and.l	(a1),d0
 	move.l	d0,(a1)+
 	ENDR
 	; 4 block of 16 pixels
-	REPT 4
+	REPT 2
 	move.l	(a0)+,d0
 	and.l	(a1),d0
 	move.l	d0,(a1)+
 	ENDR
 	; 5 block of 16 pixels
-	REPT 4
+	REPT 2
 	move.l	(a0)+,d0
 	and.l	(a1),d0
 	move.l	d0,(a1)+
 	ENDR
 	; 6 block of 16 pixels
-	REPT 4
+	REPT 2
 	move.l	(a0)+,d0
 	and.l	(a1),d0
 	move.l	d0,(a1)+
 	ENDR
 	; 7 block of 16 pixels
-	REPT 4
+	REPT 2
 	move.l	(a0)+,d0
 	and.l	(a1),d0
 	move.l	d0,(a1)+
 	ENDR
-	add.l	#screen_line_size_in_bytes-112,a1
-	add.l	#screen_line_size_in_bytes-112,a0
+	add.l	#screen_line_size_in_bytes-56,a1
+	add.l	#screen_line_size_in_bytes-56,a0
 	dbf d1,.shw_gnome_msk_frame_0
 	; show gnome frame 0
 
@@ -146,96 +152,96 @@ set_bg:
 
 .shw_gnome_frame_0:
 	; 1 block of 16 pixels
-	REPT 4
+	REPT 2
 	move.l	(a0)+,d0
 	or.l	(a1),d0
 	move.l	d0,(a1)+
 	ENDR
 	; 2 block of 16 pixels
-	REPT 4
+	REPT 2
 	move.l	(a0)+,d0
 	or.l	(a1),d0
 	move.l	d0,(a1)+
 	ENDR
 	; 3 block of 16 pixels
-	REPT 4
+	REPT 2
 	move.l	(a0)+,d0
 	or.l	(a1),d0
 	move.l	d0,(a1)+
 	ENDR
 	; 4 block of 16 pixels
-	REPT 4
+	REPT 2
 	move.l	(a0)+,d0
 	or.l	(a1),d0
 	move.l	d0,(a1)+
 	ENDR
 	; 5 block of 16 pixels
-	REPT 4
+	REPT 2
 	move.l	(a0)+,d0
 	or.l	(a1),d0
 	move.l	d0,(a1)+
 	ENDR
 	; 6 block of 16 pixels
-	REPT 4
+	REPT 2
 	move.l	(a0)+,d0
 	or.l	(a1),d0
 	move.l	d0,(a1)+
 	ENDR
 	; 7 block of 16 pixels
-	REPT 4
+	REPT 2
 	move.l	(a0)+,d0
 	or.l	(a1),d0
 	move.l	d0,(a1)+
 	ENDR
-	add.l	#screen_line_size_in_bytes-112,a1
-	add.l	#screen_line_size_in_bytes-112,a0
+	add.l	#screen_line_size_in_bytes-56,a1
+	add.l	#screen_line_size_in_bytes-56,a0
 	dbf d1,.shw_gnome_frame_0
 
 
-	; wait a key press
-	; move.w	#ccoin,-(sp)
-  	; trap	#gemdos
-  	; lea	2(a7),a7
+	;wait a key press
+	move.w	#ccoin,-(sp)
+	trap	#gemdos
+	lea	2(a7),a7
 
-backup_bg_to_pi1:	 
-	lea	buffer_outfile,a0
-	move.w	#0,(a0)+
+; ; backup_bg_to_pi1:
+; ; 	lea	buffer_outfile,a0
+; ; 	move.w	#0,(a0)+
 
-	movem.l $ffff8240.w,d0-d7
-	movem.l	d0-d7,(a0)
+; ; 	movem.l $ffff8240.w,d0-d7
+; ; 	movem.l	d0-d7,(a0)
 	
-	move.l	_v_bas_ad.w,a1
-	lea		32(a0),a0
+; ; 	move.l	_v_bas_ad.w,a1
+; ; 	lea		32(a0),a0
 
-	move.l	#screen_size_in_bytes/4-1,d0
-.fill_file:
-	move.l	(a1)+,(a0)+
-	dbf	d0,.fill_file
+; ; 	move.l	#screen_size_in_bytes/4-1,d0
+; ; .fill_file:
+; ; 	move.l	(a1)+,(a0)+
+; ; 	dbf	d0,.fill_file
 
 ; 	move.w #32/2-1,d0
 ; .fill_endoffile:
 ; 	move.w #0,(a0)+
 ; 	dbf d0,.fill_endoffile
 
-	move.w	#0,-(a7)
-	pea		outfile_fname
-	move.w	#$3c,-(a7)		; fcreate
-	trap	#gemdos
-	addq.l	#8,a7
+	; ; move.w	#0,-(a7)
+	; ; pea		outfile_fname
+	; ; move.w	#$3c,-(a7)		; fcreate
+	; ; trap	#gemdos
+	; ; addq.l	#8,a7
 
-	move.w	d0,handle_outfile
+	; ; move.w	d0,handle_outfile
 
-	pea.l buffer_outfile
-	move.l	#32066,-(a7)
-	move.w	d0,-(a7)
-	move.w	#$40,-(a7)
-	trap	#gemdos
-	lea		$c(a7),a7
+	; ; pea.l buffer_outfile
+	; ; move.l	#32066,-(a7)
+	; ; move.w	d0,-(a7)
+	; ; move.w	#$40,-(a7)
+	; ; trap	#gemdos
+	; ; lea		$c(a7),a7
 
-	move.w	handle_outfile,-(a7)
-	move.w	#$3e,-(a7)
-	trap	#gemdos
-	addq.l	#4,a7
+	; ; move.w	handle_outfile,-(a7)
+	; ; move.w	#$3e,-(a7)
+	; ; trap	#gemdos
+	; ; addq.l	#4,a7
 
 
 
@@ -254,8 +260,6 @@ restore_pal:
 	movem.l	oldpal,d0-d7
 	movem.l	d0-d7,$ffff8240.w
 
-
-	dc.w	$A009
 EOF:	
 	rts
 
