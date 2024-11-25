@@ -83,11 +83,10 @@ set_bg:
 	dbf	d0,.shw_bg
 
 	; show gnome frame1 mask
-	lea	myMskFrame0+pi1_start,a0
+	lea	gnomefull,a0
 	move.l	_v_bas_ad.w,a1
-	lea	16*screen_line_size_in_bytes(a0),a0
 	lea	16*screen_line_size_in_bytes(a1),a1
-	move.l #175,d1
+	move.l #175-1,d1
 	; d1 oqp
 	; d2-d7 ok
 	; d0 ok
@@ -98,105 +97,35 @@ set_bg:
 	; get and apply the mask for the first block of 16 pixels
 	; (4 planes) : a long word get 2 planes.
 	REPT 2
-	move.l	(a0)+,d0
-	and.l	(a1),d0
-	move.l	d0,(a1)+
+	move.l	(a0)+,(a1)+
 	ENDR
 	; 2 block of 16 pixels
 	REPT 2
-	move.l	(a0)+,d0
-	and.l	(a1),d0
-	move.l	d0,(a1)+
+	move.l	(a0)+,(a1)+
 	ENDR
 	; 3 block of 16 pixels
 	REPT 2
-	move.l	(a0)+,d0
-	and.l	(a1),d0
-	move.l	d0,(a1)+
+	move.l	(a0)+,(a1)+
 	ENDR
 	; 4 block of 16 pixels
 	REPT 2
-	move.l	(a0)+,d0
-	and.l	(a1),d0
-	move.l	d0,(a1)+
+	move.l	(a0)+,(a1)+
 	ENDR
 	; 5 block of 16 pixels
 	REPT 2
-	move.l	(a0)+,d0
-	and.l	(a1),d0
-	move.l	d0,(a1)+
+	move.l	(a0)+,(a1)+
 	ENDR
 	; 6 block of 16 pixels
 	REPT 2
-	move.l	(a0)+,d0
-	and.l	(a1),d0
-	move.l	d0,(a1)+
+	move.l	(a0)+,(a1)+
 	ENDR
 	; 7 block of 16 pixels
 	REPT 2
-	move.l	(a0)+,d0
-	and.l	(a1),d0
-	move.l	d0,(a1)+
+	move.l	(a0)+,(a1)+
 	ENDR
 	add.l	#screen_line_size_in_bytes-56,a1
-	add.l	#screen_line_size_in_bytes-56,a0
 	dbf d1,.shw_gnome_msk_frame_0
 	; show gnome frame 0
-
-	; show gnome frame1 mask
-	lea	gnomeFrame0+pi1_start,a0
-	move.l	_v_bas_ad.w,a1
-	lea	16*screen_line_size_in_bytes(a0),a0
-	lea	16*screen_line_size_in_bytes(a1),a1
-	move.l #175,d1
-
-.shw_gnome_frame_0:
-	; 1 block of 16 pixels
-	REPT 2
-	move.l	(a0)+,d0
-	or.l	(a1),d0
-	move.l	d0,(a1)+
-	ENDR
-	; 2 block of 16 pixels
-	REPT 2
-	move.l	(a0)+,d0
-	or.l	(a1),d0
-	move.l	d0,(a1)+
-	ENDR
-	; 3 block of 16 pixels
-	REPT 2
-	move.l	(a0)+,d0
-	or.l	(a1),d0
-	move.l	d0,(a1)+
-	ENDR
-	; 4 block of 16 pixels
-	REPT 2
-	move.l	(a0)+,d0
-	or.l	(a1),d0
-	move.l	d0,(a1)+
-	ENDR
-	; 5 block of 16 pixels
-	REPT 2
-	move.l	(a0)+,d0
-	or.l	(a1),d0
-	move.l	d0,(a1)+
-	ENDR
-	; 6 block of 16 pixels
-	REPT 2
-	move.l	(a0)+,d0
-	or.l	(a1),d0
-	move.l	d0,(a1)+
-	ENDR
-	; 7 block of 16 pixels
-	REPT 2
-	move.l	(a0)+,d0
-	or.l	(a1),d0
-	move.l	d0,(a1)+
-	ENDR
-	add.l	#screen_line_size_in_bytes-56,a1
-	add.l	#screen_line_size_in_bytes-56,a0
-	dbf d1,.shw_gnome_frame_0
-
 
 	;wait a key press
 	move.w	#ccoin,-(sp)
@@ -273,7 +202,7 @@ gnomeFrame0 incbin .\Assets\g0.pi1
 buffer_outfile	dcb 32066,0
 handle_outfile	dc.w 0
 outfile_fname	dc.b "..\toto\g0f.pi1",0
-
+gnomefull	incbin '.\e68kspr.bin' ; the data of gnome and background
 
 	section bss
 oldpal	ds.l 8
