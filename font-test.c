@@ -33,31 +33,45 @@ int load_degas(struct degas *target, char* filename) {
   return cnt != DEGAS_FILE_SIZE;
 }
 
-void display_character(unsigned short* video_ptr, char chr) {
+void display_character(unsigned short* video_ptr,
+                       unsigned short* background_ptr,
+                       char chr) {
   unsigned short chr_i = chr - ' ';
-  unsigned short chr_pos =
+  unsigned short* font_ptr = font.picture +
     (chr_i / FONT_CHARS_PER_LINE) * FONT_HEIGHT*LINE_WIDTH
     + (chr_i % FONT_CHARS_PER_LINE) * BIT_PLANES;
+
   for (unsigned short j=0; j < FONT_HEIGHT; j++) {
+    unsigned short mask = 0;
+    for (unsigned short i=0; i < BIT_PLANES; i++)  mask |= font_ptr[i];
     for (unsigned short i=0; i < BIT_PLANES; i++) {
-      video_ptr[i + j*LINE_WIDTH] = font.picture[chr_pos + i + j*LINE_WIDTH];
+      video_ptr[i] = (background_ptr[i] & (~mask)) | (font_ptr[i] & mask);
     }
+    background_ptr += LINE_WIDTH;
+    video_ptr += LINE_WIDTH;
+    font_ptr += LINE_WIDTH;
   }
 }
 
-void display_string(unsigned short* video_ptr, char* str) {
+void display_string(unsigned short* video_ptr,
+                    unsigned short* background_ptr,
+                    char* str) {
   while (*str != '\0') {
-    display_character(video_ptr, *str);
+    display_character(video_ptr, background_ptr, *str);
     str++;
     video_ptr += BIT_PLANES;
+    background_ptr += BIT_PLANES;
   }
 }
 
-void display_text(unsigned short* video_ptr, char** text) {
-  while (*text != '\0') {
-    display_string(video_ptr, *text);
+void display_text(unsigned short* video_ptr,
+                  unsigned short* background_ptr,
+                  char** text) {
+  while (**text != '\0') {
+    display_string(video_ptr, background_ptr, *text);
     text++;
     video_ptr += LINE_WIDTH * LINE_HEIGHT;
+    background_ptr += LINE_WIDTH * LINE_HEIGHT;
   }
 }
 
@@ -68,6 +82,9 @@ void display_picture(unsigned short* video_ptr, unsigned short* picture) {
 }
 
 int main() {
+  unsigned short* video_ptr = Physbase();
+  unsigned short* background_ptr = background.picture;
+
   char* text[4];
   text[0] = " HOWDY FOLKS";
   text[1] = "WE ARE BACK @";
@@ -77,11 +94,12 @@ int main() {
   load_degas(&background, "FOND.PI1");
   load_degas(&font, "FONTE.PI1");
 
-  unsigned short* video_ptr = Physbase();
-
   Setpalette((void*)&(font.palette));
-  display_picture(video_ptr, background.picture);
-  display_text(video_ptr + TEXT_Y*LINE_WIDTH + TEXT_X, text);
+  display_picture(video_ptr, background_ptr);
+
+  video_ptr += TEXT_Y*LINE_WIDTH + TEXT_X;
+  background_ptr += TEXT_Y*LINE_WIDTH + TEXT_X;
+  display_text(video_ptr, background_ptr, text);
   
   Cnecin();
 }
