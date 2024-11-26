@@ -82,8 +82,9 @@ void update_text(unsigned short* video_ptr) {
   for (unsigned short i=0; text_buffer[i] != '\0'; i++) {
     if (text_buffer[i] == '\n') {
       ln_count++;
-      cur_vd_ptr = video_ptr      + ln_count * LINE_WIDTH * LINE_HEIGHT;
-      cur_bg_ptr = background_ptr + ln_count * LINE_WIDTH * LINE_HEIGHT;
+      unsigned short d = ln_count * LINE_WIDTH * LINE_HEIGHT;
+      cur_vd_ptr = video_ptr + d;
+      cur_bg_ptr = background_ptr + d;
     } else {
       short delta = LINE_WIDTH * text_shift[(i*11+clk>>1) & TEXT_SHIFT_MASK];
       display_character(cur_vd_ptr + delta, cur_bg_ptr + delta, text_buffer[i]);
