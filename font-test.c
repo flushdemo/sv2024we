@@ -1,5 +1,10 @@
 #include <tos.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+// clock register
+#define REG_FRCLOCK 0x466
 
 // Font constants
 #define FONT_HEIGHT 16
@@ -11,9 +16,11 @@
 #define SCREEN_SIZE 16000 // in 16bit blocks
 
 // Text constants
-#define LINE_HEIGHT 32
+#define LINE_HEIGHT 16
 #define TEXT_X 160 - (14*4) // 14 characters - right aligned
 #define TEXT_Y (200 - (16*5)) / 2 // 5 lines centered
+#define TEXT_BUFFER_SIZE 256
+#define TEXT_SHIFT_MASK 0x3f
 
 // Degas file constants
 #define DEGAS_FILE_SIZE 32034/2 // in 16bits blocs
@@ -25,6 +32,14 @@ struct degas {
 };
 static struct degas font;
 static struct degas background;
+
+static char text_buffer[TEXT_BUFFER_SIZE];
+static short text_shift[] = {
+  0, 0, 0, 1, 1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 4,
+  5, 4, 4, 4, 4, 4, 4, 3, 3, 3, 2, 2, 1, 1, 0, 0,
+  0, 0, 0, -1, -1, -2, -2, -3, -3, -3, -4, -4, -4, -4, -4, -4,
+  -5, -4, -4, -4, -4, -4, -4, -3, -3, -3, -2, -2, -1, -1, 0, 0,
+};
 
 int load_degas(struct degas *target, char* filename) {
   FILE* fd = fopen(filename, "rb");
@@ -53,25 +68,28 @@ void display_character(unsigned short* video_ptr,
   }
 }
 
-void display_string(unsigned short* video_ptr,
-                    unsigned short* background_ptr,
-                    char* str) {
-  while (*str != '\0') {
-    display_character(video_ptr, background_ptr, *str);
-    str++;
-    video_ptr += BIT_PLANES;
-    background_ptr += BIT_PLANES;
-  }
-}
+// Returns the frames count
+long get_clock(void) { return *((long *)REG_FRCLOCK); }
 
-void display_text(unsigned short* video_ptr,
-                  unsigned short* background_ptr,
-                  char** text) {
-  while (**text != '\0') {
-    display_string(video_ptr, background_ptr, *text);
-    text++;
-    video_ptr += LINE_WIDTH * LINE_HEIGHT;
-    background_ptr += LINE_WIDTH * LINE_HEIGHT;
+void update_text(unsigned short* video_ptr) {
+  unsigned short* background_ptr = background.picture + TEXT_Y*LINE_WIDTH + TEXT_X;
+
+  unsigned short ln_count = 0;
+  unsigned short* cur_vd_ptr = video_ptr;
+  unsigned short* cur_bg_ptr = background_ptr;
+  unsigned short clk = Supexec(get_clock);
+
+  for (unsigned short i=0; text_buffer[i] != '\0'; i++) {
+    if (text_buffer[i] == '\n') {
+      ln_count++;
+      cur_vd_ptr = video_ptr      + ln_count * LINE_WIDTH * LINE_HEIGHT;
+      cur_bg_ptr = background_ptr + ln_count * LINE_WIDTH * LINE_HEIGHT;
+    } else {
+      short delta = LINE_WIDTH * text_shift[(i*11+clk>>1) & TEXT_SHIFT_MASK];
+      display_character(cur_vd_ptr + delta, cur_bg_ptr + delta, text_buffer[i]);
+      cur_vd_ptr += BIT_PLANES;
+      cur_bg_ptr += BIT_PLANES;
+    }
   }
 }
 
@@ -83,23 +101,32 @@ void display_picture(unsigned short* video_ptr, unsigned short* picture) {
 
 int main() {
   unsigned short* video_ptr = Physbase();
-  unsigned short* background_ptr = background.picture;
 
-  char* text[4];
-  text[0] = " HOWDY FOLKS";
-  text[1] = "WE ARE BACK @";
-  text[2] = "SILLY VENTURE";
-  text[3] = "";
+  char* text =" HOWDY FOLKS\n\nWE ARE BACK @\n\nSILLY VENTURE\n";
 
-  load_degas(&background, "FOND.PI1");
-  load_degas(&font, "FONTE.PI1");
+  if ( load_degas(&background, "FOND.PI1") != 0 ) {
+    printf("Error while loading FOND.PI1\n");
+    Cnecin();
+    exit(1);
+  }
+  if ( load_degas(&font, "FONTE.PI1") != 0 ) {
+    printf("Error while loading FONTE.PI1\n");
+    Cnecin();
+    exit(1);
+  }
 
   Setpalette((void*)&(font.palette));
-  display_picture(video_ptr, background_ptr);
+  display_picture(video_ptr, background.picture);
 
   video_ptr += TEXT_Y*LINE_WIDTH + TEXT_X;
-  background_ptr += TEXT_Y*LINE_WIDTH + TEXT_X;
-  display_text(video_ptr, background_ptr, text);
-  
+
+  for (unsigned short i=0; text[i] != '\0'; i++) {
+    text_buffer[i] = text[i];
+  }
+  while (1) {
+    update_text(video_ptr);
+    // update_sprite(get_clock());
+  }
+
   Cnecin();
 }
