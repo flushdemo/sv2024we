@@ -82,8 +82,11 @@ set_bg:
 	move.l	(a0)+,(a1)+
 	dbf	d0,.shw_bg
 
+	moveq.l	#8-1,d7
+	lea	garray,a2
+loop_characters:
 	; show gnome frame1 mask
-	lea	gnomefull,a0
+	move.l	(a2)+,a0
 	move.l	_v_bas_ad.w,a1
 	lea	16*screen_line_size_in_bytes(a1),a1
 	move.l #175-1,d1
@@ -131,7 +134,7 @@ set_bg:
 	move.w	#ccoin,-(sp)
 	trap	#gemdos
 	lea	2(a7),a7
-
+	dbf	d7,loop_characters
 ; ; backup_bg_to_pi1:
 ; ; 	lea	buffer_outfile,a0
 ; ; 	move.w	#0,(a0)+
@@ -202,8 +205,18 @@ gnomeFrame0 incbin .\Assets\g0.pi1
 buffer_outfile	dcb 32066,0
 handle_outfile	dc.w 0
 outfile_fname	dc.b "..\toto\g0f.pi1",0
-gnomefull	incbin '.\e68kspr.bin' ; the data of gnome and background
 
+garray	dc.l g0f, g1f, g2f, g3f
+		dc.l g4f, g5f, g6f, g7f
+
+g0f	incbin '.\g0f.bin' ; the data of gnome and background for frame 1
+g1f	incbin '.\g1f.bin' ; the data of gnome and background for frame 1
+g2f	incbin '.\g2f.bin' ; the data of gnome and background for frame 1
+g3f	incbin '.\g3f.bin' ; the data of gnome and background for frame 1
+g4f	incbin '.\g4f.bin' ; the data of gnome and background for frame 1
+g5f	incbin '.\g5f.bin' ; the data of gnome and background for frame 1
+g6f	incbin '.\g6f.bin' ; the data of gnome and background for frame 1
+g7f	incbin '.\g7f.bin' ; the data of gnome and background for frame 1
 	section bss
 oldpal	ds.l 8
 screen	ds.l	((screen_size_in_bytes*2)+256)/4 ; 2 screen, the frontbuffer and backbuffer
