@@ -103,6 +103,7 @@ int main() {
   display_picture(video_ptr, background.picture);
   for (i=0; text[i] != '\0'; i++) text_buffer[i] = text[i];
 
+  init_font_mask(font.picture);
   main_loop(video_ptr, background.picture, font.picture,
             text_buffer, text_buffer + i);
 

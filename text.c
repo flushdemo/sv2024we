@@ -11,6 +11,9 @@
 
 #define FONT_LINE (FONT_HEIGHT * LINE_WIDTH)
 
+// Mask to be used to display font
+static unsigned short font_mask[SCREEN_SIZE];
+
 // sin 64 values
 // [round(2*math.sin(x/64 * 2*math.pi)) for x in range(64)]
 static short text_shift[] = {
@@ -38,17 +41,27 @@ void display_character(unsigned short* video_ptr,
                               unsigned short* background_ptr,
                               unsigned short* font_base,
                               unsigned short chr) {
-  unsigned short* font_ptr = font_base + font_position(chr);
+  unsigned short font_pos = font_position(chr);
+  unsigned short* font_ptr = font_base + font_pos;
+  unsigned short* mask_ptr = font_mask + font_pos;
 
   for (unsigned short j=0; j < FONT_HEIGHT; j++) {
-    unsigned short mask = 0;
-    for (unsigned short i=0; i < BIT_PLANES; i++)  mask |= font_ptr[i];
+    unsigned short mask = mask_ptr[0]; // same mask for the 4 bitplanes
     for (unsigned short i=0; i < BIT_PLANES; i++) {
       video_ptr[i] = (background_ptr[i] & (~mask)) | (font_ptr[i] & mask);
     }
     background_ptr += LINE_WIDTH;
     video_ptr += LINE_WIDTH;
     font_ptr += LINE_WIDTH;
+    mask_ptr += LINE_WIDTH;
+  }
+}
+
+void init_font_mask(unsigned short* font_base) {
+  for (unsigned short i=0; i < SCREEN_SIZE / BIT_PLANES; i += BIT_PLANES) {
+    unsigned short m = 0;
+    for (unsigned short j=0; j < BIT_PLANES; j++) m |= font_base[i+j];
+    for (unsigned short j=0; j < BIT_PLANES; j++) font_mask[i+j] = m;
   }
 }
 
