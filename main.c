@@ -11,7 +11,7 @@
 #define VBL_VECTOR 28 // 0x0070 >> 2 // VBL Vector
 #define REG_FRCLOCK 0x466 // clock register
 
-#define DEGAS_FILE_SIZE 32034/2 // Degas picture format in 16bits blocs
+#define DEGAS_FILE_SIZE 32034 // Degas picture format in bytes
 #define TEXT_BUFFER_SIZE 256
 #define MUSIC_BUFFER_SIZE 32768
 
@@ -97,7 +97,7 @@ int main() {
   Supexec(soundtrack_init);
   Supexec(set_music_player_vbl);
 
-  Setpalette((void*)&(font.palette));
+  Setpalette((void*)&(background.palette));
   display_picture(video_ptr, background.picture);
   for (i=0; text[i] != '\0'; i++) text_buffer[i] = text[i];
 
