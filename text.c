@@ -9,14 +9,12 @@
 #define LINE_HEIGHT 16
 #define TEXT_SHIFT_MASK 0x3f
 
-// Sinus table - 64 values
 #define FONT_LINE (FONT_HEIGHT * LINE_WIDTH)
 
+// sin 64 values
+// [round(2*math.sin(x/64 * 2*math.pi)) for x in range(64)]
 static short text_shift[] = {
-  0, 0, 0, 1, 1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 4,
-  5, 4, 4, 4, 4, 4, 4, 3, 3, 3, 2, 2, 1, 1, 0, 0,
-  0, 0, 0, -1, -1, -2, -2, -3, -3, -3, -4, -4, -4, -4, -4, -4,
-  -5, -4, -4, -4, -4, -4, -4, -3, -3, -3, -2, -2, -1, -1, 0, 0,
+  0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1, 0, 0
 };
 
 // Optimisation of the following code
@@ -72,7 +70,7 @@ unsigned short update_text(unsigned short* video_ptr,
       cur_vd_ptr = video_ptr + d;
       cur_bg_ptr = background_ptr + d;
     } else {
-      short delta = LINE_WIDTH * text_shift[(i*11+clk>>1) & TEXT_SHIFT_MASK];
+      short delta = LINE_WIDTH * text_shift[(i*11+clk) & TEXT_SHIFT_MASK];
       display_character(cur_vd_ptr + delta, cur_bg_ptr + delta,
                         font_base, text_buffer[i]);
       cur_vd_ptr += BIT_PLANES;
