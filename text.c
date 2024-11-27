@@ -10,6 +10,8 @@
 #define TEXT_SHIFT_MASK 0x3f
 
 // Sinus table - 64 values
+#define FONT_LINE (FONT_HEIGHT * LINE_WIDTH)
+
 static short text_shift[] = {
   0, 0, 0, 1, 1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 4,
   5, 4, 4, 4, 4, 4, 4, 3, 3, 3, 2, 2, 1, 1, 0, 0,
@@ -17,10 +19,21 @@ static short text_shift[] = {
   -5, -4, -4, -4, -4, -4, -4, -3, -3, -3, -2, -2, -1, -1, 0, 0,
 };
 
+// Optimisation of the following code
+// return (chr_i / FONT_CHARS_PER_LINE) * FONT_LINE
+//      + (chr_i % FONT_CHARS_PER_LINE) * BIT_PLANES;
 unsigned short font_position(unsigned short chr) {
   unsigned short chr_i = chr - ' ';
-  return (chr_i / FONT_CHARS_PER_LINE) * FONT_HEIGHT*LINE_WIDTH
-    + (chr_i % FONT_CHARS_PER_LINE) * BIT_PLANES;
+  // values in;
+  //  0-19 : first line
+  // 20-39 : second line
+  // 40-59 : third line
+  if        (chr_i >= 40) { // third line
+    return 2*FONT_LINE + ((chr_i - 40) << 2);
+  } else if (chr_i >= 20) { // second line
+    return FONT_LINE + ((chr_i - 20) << 2);
+  }
+  return chr_i << 2;
 }
 
 void display_character(unsigned short* video_ptr,
