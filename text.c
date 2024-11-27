@@ -22,8 +22,8 @@ static void display_character(unsigned short* video_ptr,
                               unsigned short* font_base,
                               char chr) {
   unsigned short chr_i = chr - ' ';
-  unsigned short* font_ptr = font_base +
-    (chr_i / FONT_CHARS_PER_LINE) * FONT_HEIGHT*LINE_WIDTH
+  unsigned short* font_ptr = font_base
+    + (chr_i / FONT_CHARS_PER_LINE) * FONT_HEIGHT*LINE_WIDTH
     + (chr_i % FONT_CHARS_PER_LINE) * BIT_PLANES;
 
   for (unsigned short j=0; j < FONT_HEIGHT; j++) {

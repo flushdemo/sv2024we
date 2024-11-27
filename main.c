@@ -4,8 +4,9 @@
 #include <tos.h>
 
 #include "common.h"
-#include "text.h"
 #include "vbl.h"
+#include "text.h"
+#include "sprite.h"
 
 // Atari specifics
 #define VBL_VECTOR 28 // 0x0070 >> 2 // VBL Vector
@@ -58,6 +59,8 @@ void main_loop(unsigned short *video_ptr,
                unsigned short *font_ptr,
                char* text_buffer,
                char* fps_buffer) {
+  unsigned short *text_vid_ptr = video_ptr + TEXT_Y*LINE_WIDTH + TEXT_X;
+  unsigned short *text_bg_ptr = background_ptr + TEXT_Y*LINE_WIDTH + TEXT_X;
   unsigned short frames_cnt = 0;
   unsigned short old_clk = get_clock();
 
@@ -66,8 +69,8 @@ void main_loop(unsigned short *video_ptr,
     unsigned short txt_i;
 
     frames_cnt += clk - old_clk;
-    update_text(video_ptr, background_ptr, font.picture, text_buffer, clk);
-    // update_sprite(video_ptr, clk);
+    update_text(text_vid_ptr, text_bg_ptr, font.picture, text_buffer, clk);
+    update_sprite(video_ptr, background_ptr, clk);
 
     if ( !(i & 0x0f) ) {
       unsigned short fps_100 = 100*50*16 / frames_cnt; // FPS
@@ -101,9 +104,8 @@ int main() {
   display_picture(video_ptr, background.picture);
   for (i=0; text[i] != '\0'; i++) text_buffer[i] = text[i];
 
-  main_loop(video_ptr + TEXT_Y*LINE_WIDTH + TEXT_X,
-            background.picture + TEXT_Y*LINE_WIDTH + TEXT_X,
-            font.picture, text_buffer, text_buffer + i);
+  main_loop(video_ptr, background.picture, font.picture,
+            text_buffer, text_buffer + i);
 
   restore_vbl();
   Supexec(soundtrack_deinit);

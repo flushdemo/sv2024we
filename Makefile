@@ -6,7 +6,7 @@ img.prg: img.s
 main-run: main.prg
 	hatari --fast-boot true main.prg
 
-main.prg: main.o text.o vbl.o
+main.prg: main.o vbl.o text.o sprite.o
 	vc +tos -o $@ $^
 
 %.o: %.s
@@ -14,6 +14,9 @@ main.prg: main.o text.o vbl.o
 
 %.o: %.c
 	vc +tos -c -o $@ $^
+
+%.asm: %.c
+	vc +tos -S -o $@ $^
 
 clean:
 	rm -f *.prg *.tos *.o
