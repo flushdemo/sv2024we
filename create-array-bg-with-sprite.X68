@@ -276,14 +276,14 @@ put_spr_in_file:
     SIMHALT             ; halt simulator
 
 * Put variables and constants here
-spr_pic             INCBIN      '.\Assets\g1.pi1',0
-spr_msk             INCBIN      '.\Assets\g1msk.pi1',0
+spr_pic             INCBIN      '.\Assets\g0.pi1',0
+spr_msk             INCBIN      '.\Assets\g0msk.pi1',0
 
 pic_bg              INCBIN      '.\Assets\fond.pi1',0
 
-pi1_file            dc.b        '.\e68kpi1.pi1',0 ; picture with character masked and bg 
+pi1_file            dc.b        '.\g0f.pi1',0 ; picture with character masked and bg 
 
-pic_spr_bin_file    dc.b        '.\e68kspr.bin',0 ; picture with only the character and bg in a bytes array
+pic_spr_bin_file    dc.b        '.\g0f.bin',0 ; picture with only the character and bg in a bytes array
 
 
 pal                 ds.l        8
@@ -296,6 +296,7 @@ pic_final_buffer    ds.l        (screen_size_in_bytes+66)/4
  
 
     END    START        ; last line of source
+
 
 
 
