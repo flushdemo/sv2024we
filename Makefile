@@ -1,3 +1,5 @@
+CFLAGS=
+
 all: img.prg
 
 img.prg: img.s
@@ -7,16 +9,16 @@ main-run: main.prg
 	hatari --fast-boot true main.prg
 
 main.prg: main.o vbl.o text.o sprite.o
-	vc +tos -o $@ $^
+	vc +tos $(CFLAGS) -o $@ $^
 
 %.o: %.s
 	vasmm68k_mot -Faout -o $@ $^
 
 %.o: %.c
-	vc +tos -c -o $@ $^
+	vc +tos -c $(CFLAGS) -o $@ $^
 
 %.asm: %.c
-	vc +tos -S -o $@ $^
+	vc +tos -S $(CFLAGS) -o $@ $^
 
 clean:
 	rm -f *.prg *.tos *.o

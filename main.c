@@ -81,7 +81,6 @@ void main_loop(unsigned short *video_ptr,
   }
 }
 
-
 int main() {
   unsigned short* video_ptr = Physbase();
   char* text =" HOWDY FOLKS\n\nWE ARE BACK @\n\nSILLY VENTURE\n";
@@ -107,6 +106,6 @@ int main() {
   main_loop(video_ptr, background.picture, font.picture,
             text_buffer, text_buffer + i);
 
-  restore_vbl();
+  Supexec(restore_vbl);
   Supexec(soundtrack_deinit);
 }
