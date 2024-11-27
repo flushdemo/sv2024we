@@ -6,7 +6,7 @@ img.prg: img.s
 main-run: main.prg
 	hatari --fast-boot true main.prg
 
-main.prg: main.o text.o low-level.o
+main.prg: main.o text.o vbl.o
 	vc +tos -o $@ $^
 
 %.o: %.s

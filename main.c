@@ -5,7 +5,7 @@
 
 #include "common.h"
 #include "text.h"
-#include "low-level.h"
+#include "vbl.h"
 
 // Atari specifics
 #define VBL_VECTOR 28 // 0x0070 >> 2 // VBL Vector
