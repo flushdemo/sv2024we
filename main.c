@@ -5,10 +5,15 @@
 
 #include "common.h"
 #include "text.h"
+#include "low-level.h"
 
+// Atari specifics
+#define VBL_VECTOR 28 // 0x0070 >> 2 // VBL Vector
 #define REG_FRCLOCK 0x466 // clock register
+
 #define DEGAS_FILE_SIZE 32034/2 // Degas picture format in 16bits blocs
 #define TEXT_BUFFER_SIZE 256
+#define MUSIC_BUFFER_SIZE 32768
 
 // Text zone constants
 #define TEXT_X 160 - (14*4) // 14 characters - right aligned
@@ -20,29 +25,33 @@ struct degas {
   unsigned short picture[SCREEN_SIZE];
 };
 
+// To be passed as parameter
+long (*soundtrack_vbl) (); // Soundtrack VBL function
+
 // Main data areas
 static struct degas font;
 static struct degas background;
+static char music_buffer[MUSIC_BUFFER_SIZE];
 static char text_buffer[TEXT_BUFFER_SIZE];
 
 // Returns the frames count - Needs to be executed by supervisor
 static long sup_get_clock(void) { return *((long *)REG_FRCLOCK); }
 static long get_clock(void) { return Supexec(sup_get_clock); }
 
-static int load_degas(struct degas *target, char* filename) {
+static size_t load_file(char* target, char* filename, size_t length) {
   FILE* fd = fopen(filename, "rb");
-  size_t cnt = fread(target, 2, DEGAS_FILE_SIZE, fd);
+  size_t cnt = fread(target, 1, length, fd);
   fclose(fd);
-  return cnt != DEGAS_FILE_SIZE;
+  return cnt;
 }
 
 static void load_degas_or_quit(struct degas *target, char* filename) {
-  if ( load_degas(target, filename) != 0 ) {
+  if ( load_file((char*)target, filename, DEGAS_FILE_SIZE) != DEGAS_FILE_SIZE ) {
     printf("Error while loading \"%s\"\n", filename);
     Cnecin();
     exit(1);
   }
-} 
+}
 
 void main_loop(unsigned short *video_ptr,
                unsigned short *background_ptr,
@@ -62,20 +71,31 @@ void main_loop(unsigned short *video_ptr,
 
     if ( !(i & 0x0f) ) {
       unsigned short fps_100 = 100*50*16 / frames_cnt; // FPS
-      sprintf(fps_buffer, "%d.%02d FPS \n", fps_100/100, fps_100%100);
+      sprintf(fps_buffer, "\n%d.%02d FPS \n", fps_100/100, fps_100%100);
       frames_cnt = 0;
     }
     old_clk = clk;
   }
 }
 
+
 int main() {
   unsigned short* video_ptr = Physbase();
   char* text =" HOWDY FOLKS\n\nWE ARE BACK @\n\nSILLY VENTURE\n";
   unsigned short i;
-  
+
+  // Set soundtrack pointers
+  long* sndh_ptr = (long*) music_buffer;
+  long (*soundtrack_init) () = (long(*)()) &(sndh_ptr[0]);
+  long (*soundtrack_deinit) () = (long(*)()) &(sndh_ptr[1]);
+  soundtrack_vbl = (long(*)()) &(sndh_ptr[2]);
+
   load_degas_or_quit(&font, "FONTE.PI1");
   load_degas_or_quit(&background, "FOND.PI1");
+  load_file(music_buffer, "MUSIC.SND", MUSIC_BUFFER_SIZE);
+
+  Supexec(soundtrack_init);
+  Supexec(set_music_player_vbl);
 
   Setpalette((void*)&(font.palette));
   display_picture(video_ptr, background.picture);
@@ -84,4 +104,7 @@ int main() {
   main_loop(video_ptr + TEXT_Y*LINE_WIDTH + TEXT_X,
             background.picture + TEXT_Y*LINE_WIDTH + TEXT_X,
             font.picture, text_buffer, text_buffer + i);
+
+  restore_vbl();
+  Supexec(soundtrack_deinit);
 }

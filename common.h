@@ -1,5 +1,5 @@
-#ifndef __COMMON_H
-#define __COMMON_H 1
+#ifndef __SV2024_COMMON_H
+#define __SV2024_COMMON_H 1
 
 // Screen constants
 #define SCREEN_SIZE 16000 // in 16bit blocks
