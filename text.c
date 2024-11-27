@@ -17,14 +17,17 @@ static short text_shift[] = {
   -5, -4, -4, -4, -4, -4, -4, -3, -3, -3, -2, -2, -1, -1, 0, 0,
 };
 
-static void display_character(unsigned short* video_ptr,
+unsigned short font_position(unsigned short chr) {
+  unsigned short chr_i = chr - ' ';
+  return (chr_i / FONT_CHARS_PER_LINE) * FONT_HEIGHT*LINE_WIDTH
+    + (chr_i % FONT_CHARS_PER_LINE) * BIT_PLANES;
+}
+
+void display_character(unsigned short* video_ptr,
                               unsigned short* background_ptr,
                               unsigned short* font_base,
-                              char chr) {
-  unsigned short chr_i = chr - ' ';
-  unsigned short* font_ptr = font_base
-    + (chr_i / FONT_CHARS_PER_LINE) * FONT_HEIGHT*LINE_WIDTH
-    + (chr_i % FONT_CHARS_PER_LINE) * BIT_PLANES;
+                              unsigned short chr) {
+  unsigned short* font_ptr = font_base + font_position(chr);
 
   for (unsigned short j=0; j < FONT_HEIGHT; j++) {
     unsigned short mask = 0;
