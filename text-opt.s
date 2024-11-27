@@ -7,34 +7,23 @@
 	opt o+,ol+,op+,oc+,ot+,oj+,ob+,om+
 	public	_display_character_opt
 	cnop	0,4
-_display_character_opt: 
+_display_character_opt:
 	movem.l	l23,-(a7)
 	move.w	(18 + l25, a7), d6  ; chr
 	move.l	(12 + l25, a7), a6  ; font_base
 	move.l	(8  + l25, a7), a4  ; background_ptr
 	move.l	(4  + l25, a7), a3  ; video_ptr
-	dsource	"text.c"
-	debug	45
-	moveq	#0,d0
-	move.w	d6,d0
-	move.l	d0,-(a7)
+
+	move.l	d6, -(a7)       ; Only word will be used, but needs long alignment
 	jsr	_font_position
-	debug	45
-	move.w	d0,d5           ; font_pos
-	debug	46
-	moveq	#0,d0
-	move.w	d5,d0
-	lsl.l	#1,d0           ; ??? why
-	lea	(a6,d0.l),a0
-	move.l	a0,a2           ; font_ptr
-	debug	47
-	move.w	d5,d0
-	lsl.w	#1,d0
-	and.l	#65535,d0
-	lea	_font_mask,a0           ; font_mask
-	add.l	d0,a0
-	move.l	a0,a5           ; mask_ptr
-	debug	49
+	move.w	d0, d5
+        ;; multiply by 2 cause items are words
+        lsl.w   #1, d5          ; font_pos * 2
+
+	lea	(a6, d5.w), a2  ; font_ptr
+	lea	_font_mask, a5
+	add.w	d5, a5          ; mask_ptr
+
 	moveq	#15,d4
 	addq.w	#4,a7
 	bra	l16
