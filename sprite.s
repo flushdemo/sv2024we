@@ -32,9 +32,9 @@ reg_cnt	equ	4*15
 gnome_show:
 	movem.l	d0-d7/a0-a6,-(a7)
 
-
+	lsr.l	#2,d1
 	and.l	#7,d1
-	lsl     #2,d1
+	lsl.l   #2,d1
 	lea		garray,a2
 	move.l  (a2,d1.l),a0
 
