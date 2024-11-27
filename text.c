@@ -1,5 +1,6 @@
 #include "common.h"
 #include "text.h"
+#include "text-opt.h" // Optimisations
 
 // Font constants
 #define FONT_HEIGHT 16
@@ -12,7 +13,7 @@
 #define FONT_LINE (FONT_HEIGHT * LINE_WIDTH)
 
 // Mask to be used to display font
-static unsigned short font_mask[SCREEN_SIZE];
+unsigned short font_mask[SCREEN_SIZE];
 
 // sin 64 values
 // [round(2*math.sin(x/64 * 2*math.pi)) for x in range(64)]
@@ -45,9 +46,9 @@ void display_character(unsigned short* video_ptr,
   unsigned short* font_ptr = font_base + font_pos;
   unsigned short* mask_ptr = font_mask + font_pos;
 
-  for (unsigned short j=0; j < FONT_HEIGHT; j++) {
+  for (short j=FONT_HEIGHT-1; j >= 0; j--) {
     unsigned short mask = mask_ptr[0]; // same mask for the 4 bitplanes
-    for (unsigned short i=0; i < BIT_PLANES; i++) {
+    for (short i=BIT_PLANES-1; i >= 0; i--) {
       video_ptr[i] = (background_ptr[i] & (~mask)) | (font_ptr[i] & mask);
     }
     background_ptr += LINE_WIDTH;
@@ -84,8 +85,8 @@ unsigned short update_text(unsigned short* video_ptr,
       cur_bg_ptr = background_ptr + d;
     } else {
       short delta = LINE_WIDTH * text_shift[(i*11+clk) & TEXT_SHIFT_MASK];
-      display_character(cur_vd_ptr + delta, cur_bg_ptr + delta,
-                        font_base, text_buffer[i]);
+      display_character_opt(cur_vd_ptr + delta, cur_bg_ptr + delta,
+                            font_base, text_buffer[i]);
       cur_vd_ptr += BIT_PLANES;
       cur_bg_ptr += BIT_PLANES;
     }
