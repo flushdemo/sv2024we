@@ -17,7 +17,7 @@
 #define MUSIC_BUFFER_SIZE 32768
 
 // Text zone constants
-#define TEXT_X 160 - (14*4) // 14 characters - right aligned
+#define TEXT_X 160 - (13*4) // 13 characters - right aligned
 #define TEXT_Y (200 - (16*5)) / 2 // 5 lines centered
 
 struct degas {
