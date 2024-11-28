@@ -6,6 +6,7 @@
 #include "common.h"
 #include "misc.h"
 #include "printer.h"
+#include "snowflake.h"
 #include "sprite.h"
 #include "text.h"
 #include "vbl.h"
@@ -101,6 +102,7 @@ static void main_loop(unsigned short *video_ptr,
     unsigned short clk = get_clock();
     unsigned short txt_i;
 
+    update_snow(video_ptr, background_ptr, clk);
     update_printer(text_buffer, clk);
     update_text(text_vid_ptr, text_bg_ptr, font.picture, text_buffer, clk);
     update_sprite_proxy(video_ptr, background_ptr, clk);
@@ -138,6 +140,7 @@ int main() {
   display_picture(video_ptr, background.picture);
 
   init_font_mask(font.picture);
+  init_snow();
   main_loop(video_ptr, background.picture, font.picture, text_buffer);
 
   Supexec(restore_vbl);
