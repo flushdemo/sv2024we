@@ -30,31 +30,13 @@ loop_characters:
 
 	; get and apply the mask for the first block of 16 pixels
 	; (4 planes) : a long word get 2 planes.
-	REPT 2
-	move.l	(a0)+,(a1)+
-	ENDR
-	; 2 block of 16 pixels
-	REPT 2
-	move.l	(a0)+,(a1)+
-	ENDR
-	; 3 block of 16 pixels
-	REPT 2
-	move.l	(a0)+,(a1)+
-	ENDR
-	; 4 block of 16 pixels
-	REPT 2
-	move.l	(a0)+,(a1)+
-	ENDR
-	; 5 block of 16 pixels
-	REPT 2
-	move.l	(a0)+,(a1)+
-	ENDR
-	; 6 block of 16 pixels
-	REPT 2
-	move.l	(a0)+,(a1)+
-	ENDR
-	; 7 block of 16 pixels
-	REPT 2
+	; ; movem.l	(a0)+,d0/d2-d7/a3-a5
+	; ; movem.l	d0/d2-d7/a3-a5,(a1)
+	; ; lea  40(a1),a1
+	; ; movem.l	(a0)+,d2-d5
+	; ; movem.l	d2-d5,(a1)
+	; ; lea  16(a1),a1
+	REPT 2*7
 	move.l	(a0)+,(a1)+
 	ENDR
 	add.l	#160-(7*8),a1
