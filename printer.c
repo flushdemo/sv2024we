@@ -1,6 +1,6 @@
 // Prints (and erase) characters in the text buffer
 
-#define DISPLAY_TIME 64-1
+#define DISPLAY_TIME 64
 
 
 static char *talking[] = {
