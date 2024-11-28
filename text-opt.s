@@ -29,8 +29,8 @@ outer_loop:
 
         macro MASK_FONT
         move.w  (\1, a6), d3    ; font_ptr[i]
-        and.w   d5, d3          ; font_ptr[i] & mask
 	move.w	(\1, a4), d2    ; background_ptr[i]
+        and.w   d5, d3          ; font_ptr[i] & mask
         and.w   d4, d2          ; background_ptr[i] & ~mask
         or.w    d3, d2          ; (background_ptr[i] & ~mask) | (font_ptr[i] & mask)
         move.w  d2, (\1, a3)    ; store into video_ptr[i]
