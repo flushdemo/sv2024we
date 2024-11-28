@@ -1,6 +1,10 @@
 	section	"CODE",code
 	public	_update_sprite
 
+_init_sprite:
+
+	rts
+
 _update_sprite:
 reg_cnt	equ	4*15
 	movem.l	d0-d7/a0-a6,-(a7)
@@ -38,7 +42,7 @@ loop_characters:
 	REPT 2*7
 	move.l	(a0)+,(a1)+
 	ENDR
-	add.l	#160-(7*8),a1
+	add.l	#160-(7*8),a1        ; 7 blocks of 16pixels
 	dbf d1,.shw_gnome_msk_frame_0
 
 	movem.l	(a7)+,d0-d7/a0-a6
@@ -49,11 +53,11 @@ loop_characters:
 garray		dc.l g0f, g1f, g2f, g3f
 			dc.l g4f, g5f, g6f, g7f
 
-g0f			incbin '.\g0f.bin' ; the data of gnome and background for frame 1
-g1f			incbin '.\g1f.bin' ; the data of gnome and background for frame 1
-g2f			incbin '.\g2f.bin' ; the data of gnome and background for frame 1
-g3f			incbin '.\g3f.bin' ; the data of gnome and background for frame 1
-g4f			incbin '.\g4f.bin' ; the data of gnome and background for frame 1
-g5f			incbin '.\g5f.bin' ; the data of gnome and background for frame 1
-g6f			incbin '.\g6f.bin' ; the data of gnome and background for frame 1
-g7f			incbin '.\g7f.bin' ; the data of gnome and background for frame 1
+g0f			incbin '.\g0spr.bin' ; the data of gnome and background for frame 1
+g1f			incbin '.\g1spr.bin' ; the data of gnome and background for frame 1
+g2f			incbin '.\g2spr.bin' ; the data of gnome and background for frame 1
+g3f			incbin '.\g3spr.bin' ; the data of gnome and background for frame 1
+g4f			incbin '.\g4spr.bin' ; the data of gnome and background for frame 1
+g5f			incbin '.\g5spr.bin' ; the data of gnome and background for frame 1
+g6f			incbin '.\g6spr.bin' ; the data of gnome and background for frame 1
+g7f			incbin '.\g7spr.bin' ; the data of gnome and background for frame 1
