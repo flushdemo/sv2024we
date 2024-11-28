@@ -16,10 +16,11 @@
 unsigned short font_mask[SCREEN_SIZE];
 
 // sin 64 values
-// [round(2*math.sin(x/64 * 2*math.pi)) for x in range(64)]
-static short text_shift[] = {
-  0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1, 0, 0
-};
+// [round(3*math.sin(x/64 * 2*math.pi)) for x in range(64)]
+static short text_shift[] =
+  {
+    0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1, 1, 0, 0, 0, -1, -1, -1, -1, -2, -2, -2, -2, -2, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -2, -2, -2, -2, -2, -1, -1, -1, -1, 0
+  };
 
 // Optimisation of the following code
 // return (chr_i / FONT_CHARS_PER_LINE) * FONT_LINE
