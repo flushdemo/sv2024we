@@ -87,7 +87,7 @@ unsigned short update_text(unsigned short* video_ptr,
       cur_vd_ptr = video_ptr + d;
       cur_bg_ptr = background_ptr + d;
     } else {
-      if (text_buffer[i] != ' ') {
+      if (text_buffer[i] != '#') { // Special character to speed up display
         short delta = LINE_WIDTH * text_shift[(i*11+clk) & TEXT_SHIFT_MASK];
         display_character_opt(cur_vd_ptr + delta, cur_bg_ptr + delta,
                               font_base, text_buffer[i]);
