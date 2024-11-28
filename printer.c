@@ -3,8 +3,10 @@
 #define DISPLAY_TIME 64
 
 static char *talking[] = {
-  " HOWDY FOLKS\n\nWE ARE BACK @\n\nSILLY VENTURE\n",
-  " GFX EXOCET\n\n   MSX DMA\n\nCDX FLEW/MARA\n",
+  " HOWDY FOLKS\n\nWE ARE BACK @\n\nSILLY VENTURE",
+  " WE WISH YOU\n\n ALL A MERRY\n\n  CHRISTMAS",
+  "ALSO YOU ARE\n\n INVITED TO\n\nSHADOW PARTY",
+  " GFX EXOCET\n\n   MSX DMA\n\nCDX FLEW/MARA",
   ""
 };
 
