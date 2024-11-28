@@ -8,6 +8,8 @@
 #include "text.h"
 #include "sprite.h"
 
+#define SHOW_FPS 1
+
 // Atari specifics
 #define VBL_VECTOR 28 // 0x0070 >> 2 // VBL Vector
 #define REG_FRCLOCK 0x466 // clock register
@@ -61,23 +63,27 @@ void main_loop(unsigned short *video_ptr,
                char* fps_buffer) {
   unsigned short *text_vid_ptr = video_ptr + TEXT_Y*LINE_WIDTH + TEXT_X;
   unsigned short *text_bg_ptr = background_ptr + TEXT_Y*LINE_WIDTH + TEXT_X;
+  #ifdef SHOW_FPS
   unsigned short frames_cnt = 0;
   unsigned short old_clk = get_clock();
+  #endif
 
   for (unsigned short i;; i++) {
     unsigned short clk = get_clock();
     unsigned short txt_i;
 
-    frames_cnt += clk - old_clk;
     update_text(text_vid_ptr, text_bg_ptr, font.picture, text_buffer, clk);
     update_sprite(video_ptr, background_ptr, clk);
 
+    #ifdef SHOW_FPS
+    frames_cnt += clk - old_clk;
     if ( !(i & 0x0f) ) {
       unsigned short fps_100 = 100*50*16 / frames_cnt; // FPS
       sprintf(fps_buffer, "\n%d.%02d FPS \n", fps_100/100, fps_100%100);
       frames_cnt = 0;
     }
     old_clk = clk;
+    #endif
   }
 }
 
