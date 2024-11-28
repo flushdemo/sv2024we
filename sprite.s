@@ -90,14 +90,16 @@ gnome_show:
 	and.l	#7,d1
 	lsl.l   #2,d1
 	lea		garray,a2
-	move.l  (a2,d1.l),a0
+	lea		gmskarray,a3
+	move.l  (a2,d1.l),a0 ; a0 spr
+	move.l	(a3,d1.l),a4 ; a4 msk
 
 loop_characters:
 	; show gnome frame1 mask
 
-	movea.l	a6,a1
+	movea.l	a6,a1		; a1 video ptr
 	lea	16*160(a1),a1
-	move.l #175-1,d1
+	move.l #175-1,d2
 	; d1 oqp
 	; d2-d7 ok
 	; d0 ok
@@ -114,10 +116,15 @@ loop_characters:
 	; ; movem.l	d2-d5,(a1)
 	; ; lea  16(a1),a1
 	REPT 2*7
-	move.l	(a0)+,(a1)+
+	move.l	(a4)+,d7		; copie du masque
+	and.l	(a1),d7
+	move.l	d7,(a1)
+	move.l	(a0)+,d6		; copie du sprite
+	or.l	(a1),d6
+	move.l	d6,(a1)+
 	ENDR
 	add.l	#160-(7*8),a1        ; 7 blocks of 16pixels
-	dbf d1,.shw_gnome_msk_frame_0
+	dbf d2,.shw_gnome_msk_frame_0
 
 	movem.l	(a7)+,d0-d7/a0-a6
 	rts
