@@ -1,14 +1,11 @@
 CFLAGS=-g
 
-all: img.prg
+all: main.prg
 
 img.prg: img.s
 	vasmm68k_mot -Ftos -o $@ $^
 
-main-run: main.prg
-	hatari --fast-boot true main.prg
-
-main.prg: main.o vbl.o text.o misc.o sprite.o text-opt.o
+main.prg: main.o misc.o printer.o sprite.o text.o text-opt.o vbl.o
 	vc +tos $(CFLAGS) -o $@ $^
 
 %.o: %.s
@@ -23,5 +20,5 @@ main.prg: main.o vbl.o text.o misc.o sprite.o text-opt.o
 clean:
 	rm -f *.prg *.tos *.o
 
-run: img.prg
-	hatari --fast-boot true img.prg
+run: main.prg
+	hatari --fast-boot true main.prg

@@ -4,12 +4,13 @@
 #include <tos.h>
 
 #include "common.h"
-#include "vbl.h"
-#include "text.h"
-#include "sprite.h"
 #include "misc.h"
+#include "printer.h"
+#include "sprite.h"
+#include "text.h"
+#include "vbl.h"
 
-#define SHOW_FPS 1
+//#define SHOW_FPS 1
 
 // Atari specifics
 #define VBL_VECTOR 28 // 0x0070 >> 2 // VBL Vector
@@ -29,14 +30,14 @@ struct degas {
   unsigned short picture[SCREEN_SIZE];
 };
 
-// To be passed as parameter
+// <TODO> To pass as parameter
 long (*soundtrack_vbl) (); // Soundtrack VBL function
 
 // Main data areas
 static struct degas font;
 static struct degas background;
 static char music_buffer[MUSIC_BUFFER_SIZE];
-static char text_buffer[TEXT_BUFFER_SIZE];
+char text_buffer[TEXT_BUFFER_SIZE]; // Temporarily public for debugging
 
 // Returns the frames count - Needs to be executed by supervisor
 static long sup_get_clock(void) { return *((long *)REG_FRCLOCK); }
@@ -57,11 +58,11 @@ static void load_degas_or_quit(struct degas *target, char* filename) {
   }
 }
 
-void main_loop(unsigned short *video_ptr,
-               unsigned short *background_ptr,
-               unsigned short *font_ptr,
-               char* text_buffer,
-               char* fps_buffer) {
+static void main_loop(unsigned short *video_ptr,
+                      unsigned short *background_ptr,
+                      unsigned short *font_ptr,
+                      char* text_buffer,
+                      ){
   unsigned short *text_vid_ptr = video_ptr + TEXT_Y*LINE_WIDTH + TEXT_X;
   unsigned short *text_bg_ptr = background_ptr + TEXT_Y*LINE_WIDTH + TEXT_X;
   #ifdef SHOW_FPS
@@ -73,6 +74,7 @@ void main_loop(unsigned short *video_ptr,
     unsigned short clk = get_clock();
     unsigned short txt_i;
 
+    update_printer(text_buffer, clk);
     update_text(text_vid_ptr, text_bg_ptr, font.picture, text_buffer, clk);
     update_sprite(video_ptr, background_ptr, clk);
 
@@ -90,8 +92,6 @@ void main_loop(unsigned short *video_ptr,
 
 int main() {
   unsigned short* video_ptr = Physbase();
-  char* text =" HOWDY FOLKS\n\nWE ARE BACK @\n\nSILLY VENTURE\n";
-  unsigned short i;
 
   // Set soundtrack pointers
   long* sndh_ptr = (long*) music_buffer;
@@ -109,11 +109,9 @@ int main() {
   hide_mouse();
   Setpalette((void*)&(background.palette));
   display_picture(video_ptr, background.picture);
-  for (i=0; text[i] != '\0'; i++) text_buffer[i] = text[i];
 
   init_font_mask(font.picture);
-  main_loop(video_ptr, background.picture, font.picture,
-            text_buffer, text_buffer + i);
+  main_loop(video_ptr, background.picture, font.picture, text_buffer);
 
   Supexec(restore_vbl);
   Supexec(soundtrack_deinit);
