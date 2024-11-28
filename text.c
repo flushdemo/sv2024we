@@ -38,6 +38,8 @@ unsigned short font_position(unsigned short chr) {
   return chr_i << 2;
 }
 
+// Function deprecated
+// Use display_character_opt instead - speed x2
 void display_character(unsigned short* video_ptr,
                               unsigned short* background_ptr,
                               unsigned short* font_base,
