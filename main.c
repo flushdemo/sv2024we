@@ -10,7 +10,7 @@
 #include "text.h"
 #include "vbl.h"
 
-//#define SHOW_FPS 1
+#define SHOW_FPS 1
 
 // Atari specifics
 #define VBL_VECTOR 28 // 0x0070 >> 2 // VBL Vector
@@ -61,8 +61,7 @@ static void load_degas_or_quit(struct degas *target, char* filename) {
 static void main_loop(unsigned short *video_ptr,
                       unsigned short *background_ptr,
                       unsigned short *font_ptr,
-                      char* text_buffer,
-                      ){
+                      char* text_buffer) {
   unsigned short *text_vid_ptr = video_ptr + TEXT_Y*LINE_WIDTH + TEXT_X;
   unsigned short *text_bg_ptr = background_ptr + TEXT_Y*LINE_WIDTH + TEXT_X;
   #ifdef SHOW_FPS
@@ -82,7 +81,7 @@ static void main_loop(unsigned short *video_ptr,
     frames_cnt += clk - old_clk;
     if ( !(i & 0x1f) ) {
       unsigned short fps_100 = 100*50*32 / frames_cnt; // FPS
-      sprintf(fps_buffer, "\n%d.%02d#FPS#\n", fps_100/100, fps_100%100);
+      printf("\x1bH%d.%02d FPS \n", fps_100/100, fps_100%100);
       frames_cnt = 0;
     }
     old_clk = clk;
