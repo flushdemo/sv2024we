@@ -3,6 +3,8 @@
 
         xref    _soundtrack_vbl
 
+        section code
+
 _set_music_player_vbl:
         move    sr,-(sp)
         move    #$2700,sr       ; Disable interrupts (assumption to check)
