@@ -1,4 +1,5 @@
 	section	"CODE",code
+	public	_init_sprite
 	public	_update_sprite
 
 _init_sprite:
