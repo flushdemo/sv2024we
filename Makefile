@@ -8,7 +8,7 @@ img.prg: img.s
 main-run: main.prg
 	hatari --fast-boot true main.prg
 
-main.prg: main.o vbl.o text.o sprite.o text-opt.o
+main.prg: main.o vbl.o text.o misc.o sprite.o text-opt.o
 	vc +tos $(CFLAGS) -o $@ $^
 
 %.o: %.s

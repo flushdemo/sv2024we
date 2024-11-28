@@ -7,6 +7,7 @@
 #include "vbl.h"
 #include "text.h"
 #include "sprite.h"
+#include "misc.h"
 
 #define SHOW_FPS 1
 
@@ -105,6 +106,7 @@ int main() {
   Supexec(soundtrack_init);
   Supexec(set_music_player_vbl);
 
+  hide_mouse();
   Setpalette((void*)&(background.palette));
   display_picture(video_ptr, background.picture);
   for (i=0; text[i] != '\0'; i++) text_buffer[i] = text[i];
@@ -115,4 +117,5 @@ int main() {
 
   Supexec(restore_vbl);
   Supexec(soundtrack_deinit);
+  show_mouse();
 }
