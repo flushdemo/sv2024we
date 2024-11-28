@@ -16,7 +16,10 @@
 #define VBL_VECTOR 28 // 0x0070 >> 2 // VBL Vector
 #define REG_FRCLOCK 0x466 // clock register
 
+// Data sizes
 #define DEGAS_FILE_SIZE 32034 // Degas picture format in bytes
+// FONT_SIZE is in 16bit blocks, while FONT_FILE_SIZE is in bytes.
+#define FONT_FILE_SIZE (34 + FONT_SIZE*2) // 34 for Degas header
 #define TEXT_BUFFER_SIZE 256
 #define MUSIC_BUFFER_SIZE 32768
 
@@ -24,18 +27,23 @@
 #define TEXT_X 160 - (13*4) // 13 characters - right aligned
 #define TEXT_Y (200 - (16*5)) / 2 // 5 lines centered
 
-struct degas {
+struct degas_pic {
   unsigned short resolution;
   unsigned short palette[16];
   unsigned short picture[SCREEN_SIZE];
 };
 
-// <TODO> To pass as parameter
+struct degas_font {
+  unsigned short resolution;
+  unsigned short palette[16];
+  unsigned short picture[FONT_SIZE];
+};
+
 long (*soundtrack_vbl) (); // Soundtrack VBL function
 
 // Main data areas
-static struct degas font;
-static struct degas background;
+static struct degas_pic background;
+static struct degas_font font;
 static char music_buffer[MUSIC_BUFFER_SIZE];
 char text_buffer[TEXT_BUFFER_SIZE]; // Temporarily public for debugging
 
@@ -50,9 +58,17 @@ static size_t load_file(char* target, char* filename, size_t length) {
   return cnt;
 }
 
-static void load_degas_or_quit(struct degas *target, char* filename) {
+static void load_picture_or_quit(struct degas_pic *target, char* filename) {
   if ( load_file((char*)target, filename, DEGAS_FILE_SIZE) != DEGAS_FILE_SIZE ) {
-    printf("Error while loading \"%s\"\n", filename);
+    printf("Error while loading picture \"%s\"\n", filename);
+    Cnecin();
+    exit(1);
+  }
+}
+
+static void load_font_or_quit(struct degas_font *target, char* filename) {
+  if ( load_file((char*)target, filename, FONT_FILE_SIZE) != FONT_FILE_SIZE ) {
+    printf("Error while loading font \"%s\"\n", filename);
     Cnecin();
     exit(1);
   }
@@ -98,8 +114,8 @@ int main() {
   long (*soundtrack_deinit) () = (long(*)()) &(sndh_ptr[1]);
   soundtrack_vbl = (long(*)()) &(sndh_ptr[2]);
 
-  load_degas_or_quit(&font, "FONTE.PI1");
-  load_degas_or_quit(&background, "FOND.PI1");
+  load_picture_or_quit(&background, "FOND.PI1");
+  load_font_or_quit(&font, "FONTE.PI1");
   load_file(music_buffer, "MUSIC.SND", MUSIC_BUFFER_SIZE);
 
   Supexec(soundtrack_init);

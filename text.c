@@ -2,18 +2,8 @@
 #include "text.h"
 #include "text-opt.h" // Optimisations
 
-// Font constants
-#define FONT_HEIGHT 16
-#define FONT_CHARS_PER_LINE 20
-
-// Text constants
-#define LINE_HEIGHT 16
-#define TEXT_SHIFT_MASK 0x3f
-
-#define FONT_LINE (FONT_HEIGHT * LINE_WIDTH)
-
 // Mask to be used to display font
-unsigned short font_mask[SCREEN_SIZE];
+unsigned short font_mask[FONT_SIZE];
 
 // sin 64 values
 // [round(3*math.sin(x/64 * 2*math.pi)) for x in range(64)]
@@ -102,5 +92,11 @@ unsigned short update_text(unsigned short* video_ptr,
 void display_picture(unsigned short* video_ptr, unsigned short* picture) {
   for (unsigned short i=0; i<SCREEN_SIZE; i++) {
     video_ptr[i] = picture[i];
+  }
+}
+
+void display_font(unsigned short* video_ptr, unsigned short* font_data) {
+  for (unsigned short i=0; i<FONT_SIZE; i++) {
+    video_ptr[i] = font_data[i];
   }
 }
