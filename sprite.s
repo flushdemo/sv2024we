@@ -76,7 +76,7 @@ loop_msk_compute:
     dbf         d7,loop_index_spr
 
     
-    movem.l     (a7)+,d0-d7
+    movem.l     (a7)+,d0-d7/a0-a6
     rts
 
 
