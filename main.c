@@ -80,7 +80,7 @@ void main_loop(unsigned short *video_ptr,
     frames_cnt += clk - old_clk;
     if ( !(i & 0x1f) ) {
       unsigned short fps_100 = 100*50*32 / frames_cnt; // FPS
-      sprintf(fps_buffer, "\n%d.%02d FPS \n", fps_100/100, fps_100%100);
+      sprintf(fps_buffer, "\n%d.%02d#FPS#\n", fps_100/100, fps_100%100);
       frames_cnt = 0;
     }
     old_clk = clk;

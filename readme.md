@@ -11,6 +11,7 @@ v0.4 : 12.90 fps [3.2%]  (decreasing loops)
 v0.5 : 18.18 fps [40.9%] (rewrote `display_character_opt` in assembly)
 v0.6 : 20.25 fps [11.4%] (improve `display_character_opt` inner loop)
 v0.7 : 27.11 fps [33.9%] (unroll inner loop)
+v0.8 : 29.70 fps [9.5%]  (don't display spaces)
 
 # Possible improvements
 
