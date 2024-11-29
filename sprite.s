@@ -9,7 +9,6 @@ reg_cnt	equ	4*15
 	move.l	(reg_cnt+4,a7),a6       ; video_ptr (address)
 
 gnome_show:
-	lsr.l	#2,d1
 	and.l	#7,d1
 	lsl.l   #2,d1
 	lea		garray,a2

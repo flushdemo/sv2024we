@@ -27,6 +27,9 @@
 #define TEXT_X 160 - (13*4) // 13 characters - right aligned
 #define TEXT_Y (200 - (16*5)) / 2 // 5 lines centered
 
+// Misc
+#define GNOME_SPEED 5
+
 struct degas_pic {
   unsigned short resolution;
   unsigned short palette[16];
@@ -74,6 +77,23 @@ static void load_font_or_quit(struct degas_font *target, char* filename) {
   }
 }
 
+static void update_sprite_proxy(unsigned short *video_ptr,
+                                unsigned short *background_ptr,
+                                unsigned clk) {
+  static unsigned short old_clk = 0;
+  static unsigned short frame_id = 0;
+  static short div_cnt = GNOME_SPEED-1;
+  div_cnt -= (clk - old_clk);
+  if (div_cnt < 0) {
+    while (div_cnt < 0) {
+      div_cnt+= GNOME_SPEED;
+      frame_id++;
+    }
+    update_sprite(video_ptr, background_ptr, frame_id);
+  }
+  old_clk = clk;
+}
+
 static void main_loop(unsigned short *video_ptr,
                       unsigned short *background_ptr,
                       unsigned short *font_ptr,
@@ -91,7 +111,7 @@ static void main_loop(unsigned short *video_ptr,
 
     update_printer(text_buffer, clk);
     update_text(text_vid_ptr, text_bg_ptr, font.picture, text_buffer, clk);
-    update_sprite(video_ptr, background_ptr, clk);
+    update_sprite_proxy(video_ptr, background_ptr, clk);
 
     #ifdef SHOW_FPS
     frames_cnt += clk - old_clk;
