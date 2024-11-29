@@ -54,6 +54,7 @@ static char music_buffer[MUSIC_BUFFER_SIZE];
 static char text_buffer[TEXT_BUFFER_SIZE];
 
 // Video ram buffer for double buffering
+static unsigned short backsnow_buffer[SCREEN_SIZE];
 static unsigned short video_buffer[SCREEN_SIZE + 128]; // 256 bytes alignment
 
 // Returns the frames count - Needs to be executed by supervisor
@@ -83,7 +84,6 @@ static void load_font_or_quit(struct degas_font *target, char* filename) {
   }
 }
 
-
 static void update_sprite_proxy(unsigned short *video_ptr,
                                 unsigned short *background_ptr,
                                 unsigned clk) {
@@ -94,12 +94,14 @@ static void update_sprite_proxy(unsigned short *video_ptr,
   old_clk = clk;
 }
 
-void main_loop(unsigned short *video_ptr,
+static void main_loop(unsigned short *video_ptr,
                       unsigned short *vback_ptr, // double buffer
+                      unsigned short *backsnow_ptr,
                       unsigned short *background_ptr,
                       unsigned short *font_ptr,
                       char* text_buffer) {
-  unsigned short *text_bg_ptr = background_ptr + TEXT_Y*LINE_WIDTH + TEXT_X;
+  unsigned short text_d = TEXT_Y*LINE_WIDTH + TEXT_X;
+
   #ifdef SHOW_FPS
   unsigned short frames_cnt = 0;
   unsigned short old_clk = get_clock();
@@ -111,16 +113,18 @@ void main_loop(unsigned short *video_ptr,
     unsigned short txt_i;
     unsigned short *tmp_ptr;
 
-    update_snow(vback_ptr, background_ptr, clk);
+    update_snow(vback_ptr, backsnow_ptr, background_ptr, clk);
     update_printer(text_buffer, clk);
-    update_text(text_vid_ptr, text_bg_ptr, font.picture, text_buffer, clk);
-    update_sprite_proxy(vback_ptr, background_ptr, clk);
+    update_text(vback_ptr + text_d, backsnow_ptr + text_d,
+                font.picture, text_buffer, clk);
+    update_sprite_proxy(vback_ptr, backsnow_ptr, clk);
 
     // Swap video ram and back buffer
     tmp_ptr = vback_ptr;
     vback_ptr = video_ptr;
     video_ptr = tmp_ptr;
-    Setscreen((unsigned short *)-1, video_ptr, -1);
+    //Setscreen((unsigned short *)-1, video_ptr, -1);
+    Setscreen(video_ptr, video_ptr, -1);
     Vsync();
 
     #ifdef SHOW_FPS
@@ -157,10 +161,12 @@ int main() {
   Setpalette((void*)&(background.palette));
   display_picture(video_ptr, background.picture);
   display_picture(vback_ptr, background.picture);
+  display_picture(backsnow_buffer, background.picture);
 
   init_font_mask(font.picture);
   init_snow();
-  main_loop(video_ptr, vback_ptr, background.picture, font.picture, text_buffer);
+  main_loop(video_ptr, vback_ptr, backsnow_buffer,
+            background.picture, font.picture, text_buffer);
 
   Supexec(restore_vbl);
   Supexec(soundtrack_deinit);

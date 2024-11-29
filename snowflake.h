@@ -11,6 +11,7 @@
 
 void init_snow(void);
 unsigned short update_snow(unsigned short* video_ptr,
+                           unsigned short* backsnow_ptr,
                            unsigned short* background_ptr,
                            unsigned short clk);
 

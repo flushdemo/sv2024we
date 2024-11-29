@@ -59,10 +59,7 @@ void init_snow(void) {
   }
 }
 
-static void update_snow_flake(unsigned short* video_ptr,
-                              unsigned short* background_ptr,
-                              struct snow_flake *flake,
-                              unsigned short delta) {
+static void update_snow_flake(struct snow_flake *flake, unsigned short delta) {
   flake->y_velcnt -= delta;
   while (flake->y_velcnt < 0) {
     flake->y_velcnt += flake->y_vel;
@@ -74,37 +71,44 @@ static void update_snow_flake(unsigned short* video_ptr,
 }
 
 static void display_snow_flake(unsigned short* video_ptr,
+                               unsigned short* backsnow_ptr,
                                unsigned short* background_ptr,
                                const struct snow_flake *flake) {
   unsigned short displacement = LINE_WIDTH*flake->y_pos + BIT_PLANES*flake->x_block;
   video_ptr += displacement;
+  backsnow_ptr += displacement;
   background_ptr += displacement;
   for (unsigned short i=0; i < SNOW_FLAKE_HEIGHT; i++) {
     for (unsigned short j=0; j < BIT_PLANES; j++) {
       if (flake->y_pos > (MAX_SNOW_Y - 2)) {
         // Clean snow flake
         video_ptr[j] = background_ptr[j];
+        backsnow_ptr[j] = background_ptr[j];
       }
       else { // Draw snow flake
         unsigned short m = snow_flake_mask[i];
-        video_ptr[j] =
+        unsigned short v =
           (snow_flake_pic[BIT_PLANES*i + j] & m)
           | (background_ptr[j] & ~m);
+        video_ptr[j] = v;
+        backsnow_ptr[j] = v;
       }
     }
     video_ptr += LINE_WIDTH;
+    backsnow_ptr += LINE_WIDTH;
     background_ptr += LINE_WIDTH;
   }
 }
 
 unsigned short update_snow(unsigned short* video_ptr,
+                           unsigned short* backsnow_ptr,
                            unsigned short* background_ptr,
                            unsigned short clk) {
   static unsigned short old_clk = 0;
   if (old_clk == 0) old_clk = clk; // initialization fix
   for (unsigned short i=0; i < snow_count; i++) {
-    update_snow_flake(video_ptr, background_ptr, &snow[i], (clk - old_clk));
-    display_snow_flake(video_ptr, background_ptr, &snow[i]);
+    update_snow_flake(&snow[i], (clk - old_clk));
+    display_snow_flake(video_ptr, backsnow_ptr, background_ptr, &snow[i]);
   }
   old_clk = clk;
   return snow_count;
