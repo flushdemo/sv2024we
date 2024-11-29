@@ -13,6 +13,7 @@ v0.6 : 20.25 fps [11.4%] (improve `display_character_opt` inner loop)
 v0.7 : 27.11 fps [33.9%] (unroll inner loop)
 v0.8 : 29.70 fps [9.5%]  (don't display spaces)
 v0.9 : 36.36 fps         (Without FPS display on the moving zone)
+v1.1 : 45.39 fps [24.8%] (Redraw gnome only when needed)
 
 # Memory usage improvement
 

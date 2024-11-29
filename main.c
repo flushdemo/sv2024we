@@ -81,16 +81,8 @@ static void update_sprite_proxy(unsigned short *video_ptr,
                                 unsigned short *background_ptr,
                                 unsigned clk) {
   static unsigned short old_clk = 0;
-  static unsigned short frame_id = 0;
-  static short div_cnt = GNOME_SPEED-1;
-  div_cnt -= (clk - old_clk);
-  if (div_cnt < 0) {
-    while (div_cnt < 0) {
-      div_cnt+= GNOME_SPEED;
-      frame_id++;
-    }
-    update_sprite(video_ptr, background_ptr, frame_id);
-  }
+  clk = clk / GNOME_SPEED;
+  if (clk != old_clk) update_sprite(video_ptr, background_ptr, clk);
   old_clk = clk;
 }
 
@@ -115,8 +107,8 @@ static void main_loop(unsigned short *video_ptr,
 
     #ifdef SHOW_FPS
     frames_cnt += clk - old_clk;
-    if ( !(i & 0x1f) ) {
-      unsigned short fps_100 = 100*50*32 / frames_cnt; // FPS
+    if ( !(i & 0x3f) ) {
+      unsigned short fps_100 = 100*50*64 / frames_cnt; // FPS
       printf("\x1bH%d.%02d FPS \n", fps_100/100, fps_100%100);
       frames_cnt = 0;
     }
