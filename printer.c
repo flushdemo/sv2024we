@@ -62,6 +62,7 @@ static void next_step(char* buffer) {
     if (cur_str[c_cnt] == '\0') {
       buffer[c_cnt] = '\0';
       if (c_cnt > 0) buffer[c_cnt-1] = cur_str[c_cnt-1] == '\n' ? '\n' : ' ';
+      c_cnt = 0;
       state = 3;
     }
     else {
@@ -72,10 +73,15 @@ static void next_step(char* buffer) {
     break;
   }
   case 3: {
-    clear_text_buffer(buffer);
-    s_cnt = talking[s_cnt+1][0] == '\0' ? 0 : s_cnt+1; // loop or not
-    c_cnt = 0;
-    state = 0;
+    if (c_cnt < 1) {
+      c_cnt++; // Wait to clean display buffers
+    }
+    else {
+      clear_text_buffer(buffer);
+      s_cnt = talking[s_cnt+1][0] == '\0' ? 0 : s_cnt+1; // loop or not
+      c_cnt = 0;
+      state = 0;
+    }
     break;
   }
   }
