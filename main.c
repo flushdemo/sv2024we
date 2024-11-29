@@ -12,6 +12,7 @@
 #include "vbl.h"
 
 #define SHOW_FPS 1
+#define FRAMES_AVERAGE 32
 
 // Atari specifics
 #define VBL_VECTOR 28 // 0x0070 >> 2 // VBL Vector
@@ -123,14 +124,13 @@ static void main_loop(unsigned short *video_ptr,
     tmp_ptr = vback_ptr;
     vback_ptr = video_ptr;
     video_ptr = tmp_ptr;
-    //Setscreen((unsigned short *)-1, video_ptr, -1);
-    Setscreen(video_ptr, video_ptr, -1);
+    Setscreen((unsigned short *)-1, video_ptr, -1);
     Vsync();
 
     #ifdef SHOW_FPS
     frames_cnt += clk - old_clk;
-    if ( !(i & 0x3f) ) {
-      unsigned short fps_100 = 100*50*64 / frames_cnt; // FPS
+    if ( !(i & (FRAMES_AVERAGE-1)) ) {
+      unsigned short fps_100 = 100*50*FRAMES_AVERAGE / frames_cnt; // FPS
       printf("\x1bH%d.%02d FPS \n", fps_100/100, fps_100%100);
       frames_cnt = 0;
     }
