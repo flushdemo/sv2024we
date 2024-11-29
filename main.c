@@ -59,7 +59,9 @@ static char text_buffer[TEXT_BUFFER_SIZE];
 
 // Video ram buffer for double buffering
 static unsigned short backsnow_buffer[SCREEN_SIZE];
+#ifdef USE_DOUBLE_BUFFER
 static unsigned short video_buffer[SCREEN_SIZE + 128]; // 256 bytes alignment
+#endif
 
 // Returns the frames count - Needs to be executed by supervisor
 static long sup_get_clock(void) { return *((long *)REG_FRCLOCK); }
@@ -93,8 +95,9 @@ static void update_sprite_proxy(unsigned short *video_ptr,
                                 unsigned clk) {
   static unsigned short old_clk = 0;
   clk = clk / GNOME_SPEED;
-  //if (clk != old_clk)
-  update_sprite(video_ptr, background_ptr, clk);
+  //if (clk != old_clk) {
+    update_sprite(video_ptr, background_ptr, clk);
+  //}
   old_clk = clk;
 }
 
@@ -106,16 +109,16 @@ static void main_loop(unsigned short *video_ptr,
                       char* text_buffer) {
   unsigned short text_d = TEXT_Y*LINE_WIDTH + TEXT_X;
 
-  #ifdef SHOW_FPS
+#ifdef SHOW_FPS
   unsigned short frames_cnt = 0;
   unsigned short old_clk = get_clock();
-  #endif
+#endif
 
   for (unsigned short i;; i++) {
     unsigned short clk = get_clock();
     unsigned short *tmp_ptr;
 
-    #ifdef USE_DOUBLE_BUFFER
+#ifdef USE_DOUBLE_BUFFER
     // Display buffer pointed at by video_ptr
     Setscreen((unsigned short *)-1, video_ptr, -1);
     Vsync();
@@ -124,7 +127,7 @@ static void main_loop(unsigned short *video_ptr,
     tmp_ptr = vback_ptr;
     vback_ptr = video_ptr;
     video_ptr = tmp_ptr;
-    #endif
+#endif
 
     update_snow(video_ptr, backsnow_ptr, background_ptr, clk);
     update_printer(text_buffer, clk);
@@ -147,7 +150,10 @@ static void main_loop(unsigned short *video_ptr,
 
 int main() {
   unsigned short* video_ptr = Physbase();
-  unsigned short* vback_ptr = (unsigned short *)((long)(video_buffer + 128) & (long)0xffffff00);
+  unsigned short* vback_ptr;
+#ifdef USE_DOUBLE_BUFFER
+  vback_ptr = (unsigned short *)((long)(video_buffer + 128) & (long)0xffffff00);
+#endif
 
   // Set soundtrack pointers
   long* sndh_ptr = (long*) music_buffer;
@@ -165,7 +171,9 @@ int main() {
   hide_mouse();
   Setpalette((void*)&(background.palette));
   display_picture(video_ptr, background.picture);
+#ifdef USE_DOUBLE_BUFFER
   display_picture(vback_ptr, background.picture);
+#endif
   display_picture(backsnow_buffer, background.picture);
 
   init_font_mask(font.picture);

@@ -5,8 +5,9 @@
 struct snow_flake {
   unsigned short x_block; // in 0 - 19
   unsigned short x_shift; // left shift in the 16bits block in [0 - 8]
-  unsigned short y_pos; // y position (top of picture)
   unsigned short y_vel; // y velocity
+  unsigned short y_pos; // y position (top of picture)
+  unsigned short old_y_pos; // currently displayed position
   short y_velcnt; // counter to implement mouvement
 };
 
@@ -43,8 +44,9 @@ static void reset_snow_flake(struct snow_flake *flake) {
   flake->x_block = Random() % 20;
   flake->x_shift = Random() % 8;
   flake->y_vel = (Random() % (MAX_SNOW_VELOCITY-MIN_SNOW_VELOCITY)) + MIN_SNOW_VELOCITY;
-  flake->y_velcnt = 0;
   flake->y_pos = 0;
+  flake->old_y_pos = 0;
+  flake->y_velcnt = 0;
 }
 
 static void init_snow_flake(struct snow_flake *flake) {
@@ -73,31 +75,34 @@ static void update_snow_flake(struct snow_flake *flake, unsigned short delta) {
 static void display_snow_flake(unsigned short* video_ptr,
                                unsigned short* backsnow_ptr,
                                unsigned short* background_ptr,
-                               const struct snow_flake *flake) {
-  unsigned short displacement = LINE_WIDTH*flake->y_pos + BIT_PLANES*flake->x_block;
-  video_ptr += displacement;
-  backsnow_ptr += displacement;
-  background_ptr += displacement;
-  for (unsigned short i=0; i < SNOW_FLAKE_HEIGHT; i++) {
-    for (unsigned short j=0; j < BIT_PLANES; j++) {
-      if (flake->y_pos > (MAX_SNOW_Y - 2)) {
-        // Clean snow flake
-        video_ptr[j] = background_ptr[j];
-        backsnow_ptr[j] = background_ptr[j];
+                               struct snow_flake *flake) {
+  //if (flake->y_pos != flake->old_y_pos) {
+    unsigned short displacement = LINE_WIDTH*flake->y_pos + BIT_PLANES*flake->x_block;
+    video_ptr += displacement;
+    backsnow_ptr += displacement;
+    background_ptr += displacement;
+    for (unsigned short i=0; i < SNOW_FLAKE_HEIGHT; i++) {
+      for (unsigned short j=0; j < BIT_PLANES; j++) {
+        if (flake->y_pos > (MAX_SNOW_Y - 2)) {
+          // Clean snow flake
+          video_ptr[j] = background_ptr[j];
+          backsnow_ptr[j] = background_ptr[j];
+        }
+        else { // Draw snow flake
+          unsigned short m = snow_flake_mask[i];
+          unsigned short v =
+            (snow_flake_pic[BIT_PLANES*i + j] & m)
+            | (background_ptr[j] & ~m);
+          video_ptr[j] = v;
+          backsnow_ptr[j] = v;
+        }
       }
-      else { // Draw snow flake
-        unsigned short m = snow_flake_mask[i];
-        unsigned short v =
-          (snow_flake_pic[BIT_PLANES*i + j] & m)
-          | (background_ptr[j] & ~m);
-        video_ptr[j] = v;
-        backsnow_ptr[j] = v;
-      }
+      video_ptr += LINE_WIDTH;
+      backsnow_ptr += LINE_WIDTH;
+      background_ptr += LINE_WIDTH;
     }
-    video_ptr += LINE_WIDTH;
-    backsnow_ptr += LINE_WIDTH;
-    background_ptr += LINE_WIDTH;
-  }
+    flake->old_y_pos = flake->y_pos;
+  //}
 }
 
 unsigned short update_snow(unsigned short* video_ptr,

@@ -14,6 +14,10 @@ v0.7 : 27.11 fps [33.9%] (unroll inner loop)
 v0.8 : 29.70 fps [9.5%]  (don't display spaces)
 v0.9 : 36.36 fps         (Without FPS display on the moving zone)
 v1.1 : 45.39 fps [24.8%] (Redraw gnome only when needed)
+v2.0 : 16.66 fps [-63%]  (Flocons with double buffer)
+       23.52 fps [-48%]  (Flocons without double buffer)
+v2.1 : 31.37 fps [33.4%] (Redraw flakes only when really moving) [no double buffer]
+v2.2 : 38.09 fps [21.4%] (Redraw gnome only when needed) [no double buffer]
 
 # Memory usage improvement
 
