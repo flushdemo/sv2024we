@@ -17,6 +17,7 @@
 #define VBL_VECTOR 28 // 0x0070 >> 2 // VBL Vector
 #define REG_FRCLOCK 0x466 // clock register
 #define REG_SCREENPT 0x045e // Screen pointer
+// https://freemint.github.io/tos.hyp/en/bios_sysvars.html
 
 // Data sizes
 #define DEGAS_FILE_SIZE 32034 // Degas picture format in bytes
@@ -27,7 +28,7 @@
 
 // Text zone constants
 #define TEXT_X 160 - (13*4) // 13 characters - right aligned
-#define TEXT_Y (200 - (16*5)) / 2 // 5 lines centered
+#define TEXT_Y (SCREEN_LINES - (16*5)) / 2 // 5 lines centered
 
 // Misc
 #define GNOME_SPEED 5
@@ -45,7 +46,6 @@ struct degas_font {
 };
 
 long (*soundtrack_vbl) (); // Soundtrack VBL function
-unsigned short* g_video_ptr;
 
 // Main data areas
 static struct degas_pic background;
@@ -89,16 +89,12 @@ static void update_sprite_proxy(unsigned short *video_ptr,
                                 unsigned clk) {
   static unsigned short old_clk = 0;
   clk = clk / GNOME_SPEED;
-  if (clk != old_clk) update_sprite(video_ptr, background_ptr, clk);
+  //if (clk != old_clk)
+  update_sprite(video_ptr, background_ptr, clk);
   old_clk = clk;
 }
 
-long sup_update_video_ram() {
-  *((unsigned short**)REG_SCREENPT) = g_video_ptr;
-  return 0;
-}
-
-static void main_loop(unsigned short *video_ptr,
+void main_loop(unsigned short *video_ptr,
                       unsigned short *vback_ptr, // double buffer
                       unsigned short *background_ptr,
                       unsigned short *font_ptr,
@@ -118,13 +114,14 @@ static void main_loop(unsigned short *video_ptr,
     update_snow(vback_ptr, background_ptr, clk);
     update_printer(text_buffer, clk);
     update_text(text_vid_ptr, text_bg_ptr, font.picture, text_buffer, clk);
-    update_sprite_proxy(video_ptr, background_ptr, clk);
+    update_sprite_proxy(vback_ptr, background_ptr, clk);
 
     // Swap video ram and back buffer
-    g_video_ptr = vback_ptr;
+    tmp_ptr = vback_ptr;
     vback_ptr = video_ptr;
-    video_ptr = g_video_ptr;
-    Supexec(sup_update_video_ram);
+    video_ptr = tmp_ptr;
+    Setscreen((unsigned short *)-1, video_ptr, -1);
+    Vsync();
 
     #ifdef SHOW_FPS
     frames_cnt += clk - old_clk;
@@ -159,7 +156,7 @@ int main() {
   hide_mouse();
   Setpalette((void*)&(background.palette));
   display_picture(video_ptr, background.picture);
-  // display_picture(vback_ptr, background.picture);
+  display_picture(vback_ptr, background.picture);
 
   init_font_mask(font.picture);
   init_snow();
