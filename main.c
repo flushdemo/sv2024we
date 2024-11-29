@@ -11,7 +11,10 @@
 #include "text.h"
 #include "vbl.h"
 
+#define USE_DOUBLE_BUFFER 1
 #define SHOW_FPS 1
+
+// Number of frames to average for FPS
 #define FRAMES_AVERAGE 32
 
 // Atari specifics
@@ -109,23 +112,25 @@ static void main_loop(unsigned short *video_ptr,
   #endif
 
   for (unsigned short i;; i++) {
-    unsigned short *text_vid_ptr = vback_ptr + TEXT_Y*LINE_WIDTH + TEXT_X;
     unsigned short clk = get_clock();
-    unsigned short txt_i;
     unsigned short *tmp_ptr;
 
-    update_snow(vback_ptr, backsnow_ptr, background_ptr, clk);
-    update_printer(text_buffer, clk);
-    update_text(vback_ptr + text_d, backsnow_ptr + text_d,
-                font.picture, text_buffer, clk);
-    update_sprite_proxy(vback_ptr, backsnow_ptr, clk);
+    #ifdef USE_DOUBLE_BUFFER
+    // Display buffer pointed at by video_ptr
+    Setscreen((unsigned short *)-1, video_ptr, -1);
+    Vsync();
 
     // Swap video ram and back buffer
     tmp_ptr = vback_ptr;
     vback_ptr = video_ptr;
     video_ptr = tmp_ptr;
-    Setscreen((unsigned short *)-1, video_ptr, -1);
-    Vsync();
+    #endif
+
+    update_snow(video_ptr, backsnow_ptr, background_ptr, clk);
+    update_printer(text_buffer, clk);
+    update_text(video_ptr + text_d, backsnow_ptr + text_d,
+                font.picture, text_buffer, clk);
+    update_sprite_proxy(video_ptr, backsnow_ptr, clk);
 
     #ifdef SHOW_FPS
     frames_cnt += clk - old_clk;
@@ -143,7 +148,7 @@ static void main_loop(unsigned short *video_ptr,
 int main() {
   unsigned short* video_ptr = Physbase();
   unsigned short* vback_ptr = (unsigned short *)((long)(video_buffer + 128) & (long)0xffffff00);
-  
+
   // Set soundtrack pointers
   long* sndh_ptr = (long*) music_buffer;
   long (*soundtrack_init) () = (long(*)()) &(sndh_ptr[0]);
