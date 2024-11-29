@@ -20,7 +20,7 @@ _init_sprite:
     movea.l     #0,a4
     movea.l     #0,a5
     movea.l     #0,a6
-      
+
     lea         garray,a6
     lea         gmskarray,a5
     moveq.l     #8-1,d7
@@ -33,14 +33,14 @@ loop_msk_compute:
     moveq.l     #0,d2
     moveq.l     #0,d3
     moveq.l     #0,d4
-    
+
 
 ; 1 block of 16 pixels
 	move.w      0(a4),d0
-	move.w      2(a4),d2	
+	move.w      2(a4),d2
     move.w      4(a4),d3
     move.w      6(a4),d4
-	
+
     ; plane 1
 	or.w        d0,0(a3)
 	or.w        d2,0(a3)
@@ -54,14 +54,14 @@ loop_msk_compute:
 	or.w        d3,2(a3)
 	or.w        d4,2(a3)
 	not.w       2(a3)
-	
+
 	; plane 3
 	or.w        d0,4(a3)
 	or.w        d2,4(a3)
 	or.w        d3,4(a3)
 	or.w        d4,4(a3)
 	not.w       4(a3)
-	
+
 	; plane 4
 	or.w        d0,6(a3)
 	or.w        d2,6(a3)
@@ -71,11 +71,11 @@ loop_msk_compute:
 
     lea         8(a4),a4
     lea         8(a3),a3
-    
+
     dbf         d6,loop_msk_compute
     dbf         d7,loop_index_spr
 
-    
+
     movem.l     (a7)+,d0-d7/a0-a6
     rts
 
@@ -147,6 +147,9 @@ g4f			incbin '.\g4spr.bin' ; the data of gnome and background for frame 1
 g5f			incbin '.\g5spr.bin' ; the data of gnome and background for frame 1
 g6f			incbin '.\g6spr.bin' ; the data of gnome and background for frame 1
 g7f			incbin '.\g7spr.bin' ; the data of gnome and background for frame 1
+
+
+        section bss
 
 g0msk		dcb.b 9800,$0
 g1msk		dcb.b 9800,$0
