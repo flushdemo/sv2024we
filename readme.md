@@ -4,6 +4,10 @@ Une nouvelle démo ! Incroyable !
 
 Pour lire les image .pi1, utiliser grafx2 sous Linux.
 
+## Taille du gnome
+
+origine x,y (0, 21), largeur,hauteur (96, 160)
+
 # Todo
 
 ## Snowflakes drawings
