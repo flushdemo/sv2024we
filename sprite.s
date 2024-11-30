@@ -123,11 +123,11 @@ g7f			incbin '.\g7spr.bin' ; the data of gnome and background for frame 1
 
         section bss
 
-g0msk		dcb.b 2450
-g1msk		dcb.b 2450
-g2msk		dcb.b 2450
-g3msk		dcb.b 2450
-g4msk		dcb.b 2450
-g5msk		dcb.b 2450
-g6msk		dcb.b 2450
-g7msk		dcb.b 2450
+g0msk		ds.b 2450
+g1msk		ds.b 2450
+g2msk		ds.b 2450
+g3msk		ds.b 2450
+g4msk		ds.b 2450
+g5msk		ds.b 2450
+g6msk		ds.b 2450
+g7msk		ds.b 2450
