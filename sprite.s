@@ -34,10 +34,11 @@ loop_msk_compute:
 	not.w       d4
 	move.w      d4,(a3)+
 
-    lea         8(a4),a4
+    addq.l      #8,a4
 
     dbf         d6,loop_msk_compute
     dbf         d7,loop_index_spr
+
 
 
     movem.l     (a7)+,d0-d7/a0-a6
@@ -92,9 +93,9 @@ loop_characters:
     and.w       d1,6(a1)
     or.l        d4,0(a1)
     or.l        d3,4(a1)
-    lea         8(a0),a0
-    lea         2(a4),a4
-    lea         8(a1),a1
+    addq.l      #8,a0
+    addq.l      #2,a4
+    addq.l      #8,a1
 	ENDR
 	
 	add.l	#160-(7*8),a1        ; 7 blocks of 16pixels
