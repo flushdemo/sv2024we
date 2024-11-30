@@ -176,6 +176,7 @@ int main() {
 
   init_font_mask(font.picture);
   init_snow();
+  init_sprite();
   //init_sprite(); // <= FIXME: bug probably odd address.
   main_loop(video_ptr, vback_ptr, backsnow_buffer,
             background.picture, font.picture, text_buffer);
