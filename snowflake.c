@@ -67,7 +67,8 @@ static unsigned short snow_count;
 
 static void reset_snow_flake(struct snow_flake *flake) {
   flake->variant = Random() % SNOW_FLAKE_VARIANTS;
-  flake->x_block = (Random() % (SNOW_MAX_X_BLOCK-SNOW_MIN_X_BLOCK)) + SNOW_MIN_X_BLOCK;
+  flake->x_block = ((Random() % 18) + 4) % 20; // flakes in columns 0, 1, 4, 5 -- 19.
+  // Avoid columns 2, 3, center of gnome - too much clipping
   flake->x_shift = Random() % 8;
   flake->y_vel = (Random() % (MAX_SNOW_VELOCITY-MIN_SNOW_VELOCITY)) + MIN_SNOW_VELOCITY;
   flake->y_pos = 0;
