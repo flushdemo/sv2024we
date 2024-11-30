@@ -7,11 +7,12 @@
 #define SHOW_FPS 1
 
 // Screen constants
-#define SCREEN_LINES 200
-#define SCREEN_SIZE 16000 // in 16bit blocks
+#define SCREEN_LINES 200 // Number of lines on the screen
+#define LINE_WIDTH 80 // 80 16bits blocks per line
+#define SCREEN_SIZE (SCREEN_LINES * LINE_WIDTH) // in 16bits blocks
 #define BIT_PLANES 4
 
-// Text zone constants
-#define LINE_WIDTH 80 // 80 16bits blocks per line
+// Gnome constants
+#define GNOME_WIDTH 7 // in 16 bits blocks
 
 #endif

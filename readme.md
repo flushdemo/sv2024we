@@ -34,6 +34,7 @@ v1.2 : 16.66 fps [-63%]  (Flocons with double buffer)
        23.52 fps [-48%]  (Flocons without double buffer)
 v1.3 : 31.37 fps [33.4%] (Redraw flakes only when really moving) [no double buffer]
 v1.4 : 38.09 fps [21.4%] (Redraw gnome only when needed) [no double buffer]
+v1.5 : 37.20 fps [-3%]   (Smart snow flakes masks) [no double buffer]
 
 # Memory usage improvement
 

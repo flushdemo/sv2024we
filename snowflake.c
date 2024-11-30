@@ -17,31 +17,47 @@ struct snow_flake {
 // 8 bits LSB used
 static unsigned short snow_flake_pic[] = {
   0x0000, 0x0000, 0x0000, 0x0000,
-  0x0000, 0x0000, 0x0000, 0x0000,
   0x0000, 0x0000, 0x001c, 0x001c, 
   0x0000, 0x0000, 0x003e, 0x003e, 
   0x0000, 0x0000, 0x003e, 0x003e, 
   0x0000, 0x0000, 0x003e, 0x003e, 
   0x0000, 0x0000, 0x001c, 0x001c, 
-  0x0000, 0x0000, 0x0000, 0x0000,
 };
 
 static unsigned short snow_flake_mask[] = {
   0x0000,
-  0x0000,
-  0x0000,
   0x001c,
   0x003e,
   0x003e,
   0x003e,
   0x001c,
 };
+
+static unsigned short background_mask[] = {
+  0x003e,
+  0x0022,
+  0x0000,
+  0x0000,
+  0x0000,
+  0x0000,
+};
+
+static unsigned short foreground_mask[] = {
+  0xffc1,
+  0xffc1,
+  0xffc1,
+  0xffc1,
+  0xffc1,
+  0xffe3,
+};
+
 
 struct snow_flake snow[MAX_SNOW_FLAKES];
 unsigned short snow_count;
 
 static void reset_snow_flake(struct snow_flake *flake) {
-  flake->x_block = Random() % 20;
+  flake->x_block = (Random() % (SNOW_MAX_X_BLOCK-SNOW_MIN_X_BLOCK)) + SNOW_MIN_X_BLOCK;
+  //flake->x_block = (Random() % 13) + 7;
   flake->x_shift = Random() % 8;
   flake->y_vel = (Random() % (MAX_SNOW_VELOCITY-MIN_SNOW_VELOCITY)) + MIN_SNOW_VELOCITY;
   flake->y_pos = 0;
@@ -89,12 +105,14 @@ static void display_snow_flake(unsigned short* video_ptr,
           backsnow_ptr[j] = background_ptr[j];
         }
         else { // Draw snow flake
-          unsigned short m = snow_flake_mask[i];
-          unsigned short v =
-            (snow_flake_pic[BIT_PLANES*i + j] & m)
-            | (background_ptr[j] & ~m);
-          video_ptr[j] = v;
-          backsnow_ptr[j] = v;
+          unsigned short sm = snow_flake_mask[i];
+          unsigned short bm = background_mask[i];
+          unsigned short fm = foreground_mask[i];
+          unsigned short sp = snow_flake_pic[BIT_PLANES*i + j];
+          unsigned short bg = background_ptr[j];
+          unsigned short fg = video_ptr[j];
+          video_ptr[j] = (sp & sm) | (bg & bm) | (fg & fm);
+          backsnow_ptr[j] = (sp & sm) | (bg & ~sm);
         }
       }
       video_ptr += LINE_WIDTH;

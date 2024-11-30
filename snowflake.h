@@ -3,11 +3,14 @@
 
 #include "common.h"
 
-#define SNOW_FLAKE_HEIGHT 8
+#define SNOW_FLAKE_HEIGHT 6
 #define MAX_SNOW_FLAKES 10
 #define MAX_SNOW_Y (SCREEN_LINES - SNOW_FLAKE_HEIGHT)
 #define MIN_SNOW_VELOCITY 4
 #define MAX_SNOW_VELOCITY 12
+
+#define SNOW_MIN_X_BLOCK GNOME_WIDTH // Included
+#define SNOW_MAX_X_BLOCK 20 // Excluded
 
 void init_snow(void);
 unsigned short update_snow(unsigned short* video_ptr,
