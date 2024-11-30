@@ -1,5 +1,7 @@
 Une nouvelle démo ! Incroyable !
 
+# Notes
+
 Pour lire les image .pi1, utiliser grafx2 sous Linux.
 
 # Todo
@@ -30,26 +32,45 @@ v1.4 : 38.09 fps [21.4%] (Redraw gnome only when needed) [no double buffer]
 v1.5 : 37.20 fps [-3%]   (Smart snow flakes masks) [no double buffer]
 v1.7 : 47.76 fps [28.4%] (Critical operations on longs instead of words + optim)
 
-# Memory usage improvement
+# Memory usage
 
-Information from Hatari debugger mode.
+## target
 
-## Before font file optimisation
-text: 0x30f0, data: 0x1342c, bss: 0x1f894, symtab: 0x690
+| background      | 32000  |
+| font            | 7680   |
+| music-buffer    | 32768  |
+| text-buffer     | 256    |
+| backsnow-buffer | 32000  |
+| video-buffer    | 32000  |
+| video-ram       | 32000  |
+| font-mask       | 7680   |
+| gnome-picture   | 61440  |
+| gnome-mask      | 15360  |
+|-----------------|--------|
+| total           | 253184 |
 
-| text  | 12528  |
-| data  | 78892  |
-| bss   | 129172 |
+## v2.0
+
+text: 0x36ac, data: 0x134a4, bss: 0x3684e, symtab: 0x70e
+
+| text  | 13996  |
+| data  | 79012  |
+| bss   | 223310 |
 |-------|--------|
-| total | 220592 |
+| total | 326318 |
 
-## After font file  optimisation:
-text: 0x31a0, data: 0x1342c, bss: 0x13a94, symtab: 0x6ac
+delta vs target = 59138 (- (- 326318 253184) 13996)
 
-| text  | 12704  |
-| data  | 78892  |
-| bss   | 80532  |
+## test
+
+text: 0x3694, data: 0x134a4, bss: 0x2cf32, symtab: 0x70e
+
+| text  | 13972  |
+| data  | 79012  |
+| bss   | 184114 |
 |-------|--------|
-| total | 172128 |
+| total | 277098 |
+
+Delta v2.0 : 49220
 
 
