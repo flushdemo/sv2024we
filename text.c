@@ -56,7 +56,8 @@ void init_font_mask(unsigned short* font_base) {
   for (unsigned short i=0; i < SCREEN_SIZE / BIT_PLANES; i += BIT_PLANES) {
     unsigned short m = 0;
     for (unsigned short j=0; j < BIT_PLANES; j++) m |= font_base[i+j];
-    for (unsigned short j=0; j < BIT_PLANES; j++) font_mask[i+j] = m;
+    // Storing inverted mask
+    for (unsigned short j=0; j < BIT_PLANES; j++) font_mask[i+j] = ~m;
   }
 }
 

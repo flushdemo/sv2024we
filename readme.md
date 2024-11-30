@@ -11,11 +11,6 @@ Pour lire les image .pi1, utiliser grafx2 sous Linux.
 - use only required bitplanes
 - write in assembly
 
-## Characters drawings
-
-- use long instead of words
-- use only required bitplanes
-
 # Performance tracking
 
 v0.1 :  8.88 fps
@@ -33,6 +28,7 @@ v1.2 : 16.66 fps [-63%]  (Flocons with double buffer)
 v1.3 : 31.37 fps [33.4%] (Redraw flakes only when really moving) [no double buffer]
 v1.4 : 38.09 fps [21.4%] (Redraw gnome only when needed) [no double buffer]
 v1.5 : 37.20 fps [-3%]   (Smart snow flakes masks) [no double buffer]
+v1.7 : 47.76 fps [28.4%] (Critical operations on longs instead of words + optim)
 
 # Memory usage improvement
 

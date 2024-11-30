@@ -23,22 +23,17 @@ _display_character_opt:
 
 	moveq	#15, d7         ; j
 outer_loop:
-	move.w	(a5), d5        ; mask
-        move.w  d5, d4
-        not.w   d4              ; ~mask
+	move.l	(a5), d4        ; ~mask
 
         macro MASK_FONT
-        move.w  (\1, a6), d3    ; font_ptr[i]
-	move.w	(\1, a4), d2    ; background_ptr[i]
-        and.w   d5, d3          ; font_ptr[i] & mask
-        and.w   d4, d2          ; background_ptr[i] & ~mask
-        or.w    d3, d2          ; (background_ptr[i] & ~mask) | (font_ptr[i] & mask)
-        move.w  d2, (\1, a3)    ; store into video_ptr[i]
+        move.l  (\1, a6), d3    ; font_ptr[i]
+	move.l	(\1, a4), d2    ; background_ptr[i]
+        and.l   d4, d2          ; background_ptr[i] & ~mask
+        or.l    d3, d2          ; (background_ptr[i] & ~mask) | (font_ptr[i] & mask)
+        move.l  d2, (\1, a3)    ; store into video_ptr[i]
         endm
 
-        MASK_FONT 6
         MASK_FONT 4
-        MASK_FONT 2
         MASK_FONT 0
 
 	add.l	#160,a4
@@ -49,7 +44,7 @@ outer_loop:
 	subq.w	#1,d7
 	bge	outer_loop
 
-reg_lst	reg	a3/a4/a5/a6/d2/d3/d4/d5/d7
-	movem.l	(a7)+,a3/a4/a5/a6/d2/d3/d4/d5/d7
-reg_cnt	equ	4*9
+reg_lst	reg	a3/a4/a5/a6/d2/d3/d4/d7
+	movem.l	(a7)+,a3/a4/a5/a6/d2/d3/d4/d7
+reg_cnt	equ	4*8
 	rts
