@@ -6,7 +6,6 @@ Pour lire les image .pi1, utiliser grafx2 sous Linux.
 
 ## Snowflakes drawings
 
-- use foreground (only in "sprintes zones")
 - notion of zones (gnome, text)
 - use backsnow only in sprites zones
 - use only required bitplanes
@@ -16,7 +15,6 @@ Pour lire les image .pi1, utiliser grafx2 sous Linux.
 
 - use long instead of words
 - use only required bitplanes
-
 
 # Performance tracking
 
