@@ -3,7 +3,7 @@
 	public	_update_sprite
 
 _init_sprite:
-     ;movem.l     d0-d7/a0-a6,-(a7)
+    movem.l     d0-d7/a0-a6,-(a7)
     ; collect the palette data
 
     lea         garray,a6
