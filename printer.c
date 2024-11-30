@@ -1,7 +1,8 @@
+#include "common.h"
+
 // Prints (and erase) characters in the text buffer
 
 #define DISPLAY_TIME 64
-
 
 static char *talking[] = {
   " HOWDY FOLKS\n\nWE ARE BACK @\n\nSILLY VENTURE",
@@ -73,15 +74,19 @@ static void next_step(char* buffer) {
     break;
   }
   case 3: {
+#ifdef USE_DOUBLE_BUFFER
     if (c_cnt < 1) {
-      c_cnt++; // Wait to clean display buffers
+      c_cnt++; // Wait to clean double buffer
     }
     else {
+#endif
       clear_text_buffer(buffer);
       s_cnt = talking[s_cnt+1][0] == '\0' ? 0 : s_cnt+1; // loop or not
       c_cnt = 0;
       state = 0;
+#ifdef USE_DOUBLE_BUFFER
     }
+#endif
     break;
   }
   }

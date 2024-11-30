@@ -76,7 +76,7 @@ static void display_snow_flake(unsigned short* video_ptr,
                                unsigned short* backsnow_ptr,
                                unsigned short* background_ptr,
                                struct snow_flake *flake) {
-  //if (flake->y_pos != flake->old_y_pos) {
+  if (flake->y_pos != flake->old_y_pos) {
     unsigned short displacement = LINE_WIDTH*flake->y_pos + BIT_PLANES*flake->x_block;
     video_ptr += displacement;
     backsnow_ptr += displacement;
@@ -102,7 +102,7 @@ static void display_snow_flake(unsigned short* video_ptr,
       background_ptr += LINE_WIDTH;
     }
     flake->old_y_pos = flake->y_pos;
-  //}
+  }
 }
 
 unsigned short update_snow(unsigned short* video_ptr,

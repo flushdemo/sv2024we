@@ -11,11 +11,8 @@
 #include "text.h"
 #include "vbl.h"
 
-#define USE_DOUBLE_BUFFER 1
-#define SHOW_FPS 1
-
 // Number of frames to average for FPS
-#define FRAMES_AVERAGE 32
+#define FPS_FRAMES_AVERAGE 32
 
 // Atari specifics
 #define VBL_VECTOR 28 // 0x0070 >> 2 // VBL Vector
@@ -95,9 +92,10 @@ static void update_sprite_proxy(unsigned short *video_ptr,
                                 unsigned clk) {
   static unsigned short old_clk = 0;
   clk = clk / GNOME_SPEED;
-  //if (clk != old_clk) {
+#ifdef GNOME_SMART_DRAWING
+  if (clk != old_clk)
+#endif
     update_sprite(video_ptr, background_ptr, clk);
-  //}
   old_clk = clk;
 }
 
@@ -137,8 +135,8 @@ static void main_loop(unsigned short *video_ptr,
 
     #ifdef SHOW_FPS
     frames_cnt += clk - old_clk;
-    if ( !(i & (FRAMES_AVERAGE-1)) ) {
-      unsigned short fps_100 = 100*50*FRAMES_AVERAGE / frames_cnt; // FPS
+    if ( !(i & (FPS_FRAMES_AVERAGE-1)) ) {
+      unsigned short fps_100 = 100*50*FPS_FRAMES_AVERAGE / frames_cnt; // FPS
       printf("\x1bH%d.%02d FPS \n", fps_100/100, fps_100%100);
       frames_cnt = 0;
     }
