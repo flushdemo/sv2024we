@@ -13,7 +13,7 @@ _init_sprite:
 loop_index_spr:
     move.l      (a6)+,a4     ; a4 pointer to sprite
     move.l      (a5)+,a3     ; a3 pointer to computed mask
-    move.l      #9800/8-1,d6
+    move.l      #9800/8-1,d6 ; 175 lines of 56 bytes (7 * 8 bytes (16 pixels * 4 planes))
 
 loop_msk_compute:
     moveq.l     #0,d1
