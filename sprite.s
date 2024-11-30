@@ -50,22 +50,22 @@ _update_sprite:
 reg_cnt	equ	4*15
 	movem.l	d0-d7/a0-a6,-(a7)
 	move.w	(reg_cnt+14,a7),d1      ; clk (word)
-        ;move.l  (reg_cnt+8,a7),a2       ; background_ptr (address)
+	move.l  (reg_cnt+8,a7),a5       ; background_ptr (address)
 	move.l	(reg_cnt+4,a7),a6       ; video_ptr (address)
 
 gnome_show:
-	and.l	#7,d1
-	lsl.l   #2,d1
-	lea		garray,a2
-	lea		gmskarray,a3
-	move.l  (a2,d1.l),a0 ; a0 spr
-	move.l	(a3,d1.l),a4 ; a4 msk
+	and.w	#7,d1
+	lsl.w   #2,d1
+	lea		garray,a2      ; tableau des sprites
+	lea		gmskarray,a3   ; tableau des masques
+	move.l  (a2,d1.w),a0 ; a0 spr
+	move.l	(a3,d1.w),a4 ; a4 msk
 
-loop_characters:
+
 	; show gnome frame1 mask
 
-	movea.l	a5,a1		; a1 video ptr
-	lea	16*160(a1),a1
+	add.l  #16*160,a5
+	add.l  #16*160,a6
 	move.l #175-1,d2
 	; d1 oqp
 	; d2-d7 ok
@@ -84,21 +84,26 @@ loop_characters:
 	; ; lea  16(a1),a1
 	;FIXME: need to clean character for each previous frame.
 	REPT 7
-    move.w      (a4),d1
-    move.l      (a0),d4
-    move.l      4(a0),d3
-    and.w       d1,0(a1)
-    and.w       d1,2(a1)
-    and.w       d1,4(a1)
-    and.w       d1,6(a1)
-    or.l        d4,0(a1)
-    or.l        d3,4(a1)
-    addq.l      #8,a0
+    move.w      (a4),d1		; msk nb
+	swap		d1
+	move.w		(a4),d1
+	move.l		d1,d3
+	and.l       0(a5),d1    ; background bit plane 1 et 2 and mask
+	or.l        0(a0),d1    ; or sprite bit plane 1 et 2
+	move.l		d1,0(a6)    ; a6 ecran a5 background a0 sprite
+
+	and.l		4(a5),d3   ; background bit plane 3 et 4 and mask		
+	or.l        4(a0),d3   ; or sprite bit plane 3 et 4
+    move.l		d3,4(a6)
+	
+	addq.l		#8,a0
+    addq.l      #8,a6
+    addq.l      #8,a5
     addq.l      #2,a4
-    addq.l      #8,a1
 	ENDR
 	
-	add.l	#160-(7*8),a1        ; 7 blocks of 16pixels
+	add.l	#160-(7*8),a5        ; 7 blocks of 16pixels
+	add.l	#160-(7*8),a6        ; 7 blocks of 16pixels
 	dbf d2,.shw_gnome_msk_frame_0
 
 	movem.l	(a7)+,d0-d7/a0-a6
