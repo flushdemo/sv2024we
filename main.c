@@ -26,10 +26,6 @@
 #define FONT_FILE_SIZE (34 + FONT_SIZE*2) // 34 for Degas header
 #define MUSIC_BUFFER_SIZE 32768
 
-// Text zone constants
-#define TEXT_X 160 - (13*4) // 13 characters - right aligned
-#define TEXT_Y (SCREEN_LINES - (16*5)) / 2 // 5 lines centered
-
 // Misc
 #define GNOME_SPEED 5
 
@@ -51,7 +47,9 @@ long (*soundtrack_vbl) (); // Soundtrack VBL function
 static struct degas_pic background;
 static struct degas_font font;
 static char music_buffer[MUSIC_BUFFER_SIZE];
-static char text_buffer[TEXT_BUFFER_SIZE];
+
+// Needed global for now
+char text_buffer[TEXT_BUFFER_SIZE];
 
 // Video ram buffer for double buffering
 static unsigned short backsnow_buffer[SCREEN_SIZE];
@@ -104,8 +102,6 @@ static void main_loop(unsigned short *video_ptr,
                       unsigned short *background_ptr,
                       unsigned short *font_ptr,
                       char* text_buffer) {
-  unsigned short text_d = TEXT_Y*LINE_WIDTH + TEXT_X;
-
 #ifdef SHOW_FPS
   unsigned short frames_cnt = 0;
   unsigned short old_clk = get_clock();
@@ -128,8 +124,7 @@ static void main_loop(unsigned short *video_ptr,
 
     update_snow(video_ptr, backsnow_ptr, background_ptr, clk);
     update_printer(text_buffer, clk);
-    update_text(video_ptr + text_d, backsnow_ptr + text_d,
-                font.picture, text_buffer, clk);
+    update_text(video_ptr, backsnow_ptr, font.picture, text_buffer, clk);
     update_sprite_proxy(video_ptr, backsnow_ptr, clk);
 
     #ifdef SHOW_FPS

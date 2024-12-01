@@ -1,8 +1,12 @@
 #include "common.h"
 #include "text.h"
 
-// Mask to be used to display font
+// Mask to be used to display font - actually background behind font
 unsigned short font_mask[FONT_SIZE];
+
+// Storing coordinates of each text box
+unsigned short char_block[TEXT_BUFFER_SIZE]; // block count 0 - 19
+unsigned short char_top_y[TEXT_BUFFER_SIZE];
 
 // sin 64 values
 // [round(3*math.sin(x/64 * 2*math.pi)) for x in range(64)]
@@ -62,41 +66,48 @@ void init_font_mask(unsigned short* font_base) {
 
 // 6% time spent in this function
 // Returns the position of the end of string (character '\0')
-unsigned short update_text(unsigned short* video_ptr,
+void update_text(unsigned short* video_ptr,
                            unsigned short* background_ptr,
                            unsigned short* font_base,
                            const char* text_buffer,
                            unsigned short clk) {
-  static short old_delta[TEXT_BUFFER_SIZE];
+  static short old_y_offset[TEXT_BUFFER_SIZE];
   static short old_text[TEXT_BUFFER_SIZE];
 
   unsigned short ln_count = 0;
-  unsigned short* cur_vd_ptr = video_ptr;
-  unsigned short* cur_bg_ptr = background_ptr;
-  unsigned short i;
+  unsigned short blk_count = TEXT_STARTING_BLOCK;
 
-  for (i=0; text_buffer[i] != '\0'; i++) {
+  for (unsigned short i=0; text_buffer[i] != '\0'; i++) {
     if (text_buffer[i] == '\n') {
       ln_count++;
-      unsigned short d = ln_count * LINE_WIDTH * LINE_HEIGHT;
-      cur_vd_ptr = video_ptr + d;
-      cur_bg_ptr = background_ptr + d;
+      blk_count = TEXT_STARTING_BLOCK; // To update bouding boxes
     } else {
       if (text_buffer[i] != '#') { // Special character to speed up display
-        short delta = LINE_WIDTH * text_shift[(i*11+clk) & TEXT_SHIFT_MASK];
-        if (old_delta[i] != delta || old_text[i] != text_buffer[i]) { // Did we change anything ?
+        unsigned short y_offset = text_shift[(i*11+clk) & TEXT_SHIFT_MASK];
+        if (old_y_offset[i] != y_offset || old_text[i] != text_buffer[i]) { // Did we change anything ?
+          unsigned short y_coord  = TEXT_Y + ln_count * LINE_HEIGHT + y_offset;
+          unsigned short y_disp   = y_coord * LINE_WIDTH;
+          unsigned short x_disp   = blk_count * BIT_PLANES;
           unsigned short font_pos = font_position(text_buffer[i]);
-          display_character_opt(cur_vd_ptr + delta, cur_bg_ptr + delta,
+
+          display_character_opt(video_ptr + y_disp + x_disp,
+                                background_ptr + y_disp + x_disp,
                                 font_base + font_pos, font_mask + font_pos);
-          old_delta[i] = delta;
+
+          // Update previous state
+          old_y_offset[i] = y_offset;
           old_text[i] = text_buffer[i];
+
+#ifdef FLICKER_REDUCTION
+          // Update characters bounding boxes
+          char_block[i] = blk_count;
+          char_top_y[i] = y_coord;
+#endif
         }
       }
-      cur_vd_ptr += BIT_PLANES;
-      cur_bg_ptr += BIT_PLANES;
+      blk_count++;
     }
   }
-  return i;
 }
 
 void display_picture(unsigned short* video_ptr, unsigned short* picture) {

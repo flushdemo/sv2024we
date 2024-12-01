@@ -28,11 +28,11 @@ static unsigned short flake_sine[] = {
 // 8 bits LSB used
 static unsigned short snow_flake_pic[] = {
   0x0000, 0x0000, 0x0000, 0x0000,
-  0x0000, 0x0000, 0x001c, 0x001c, 
-  0x0000, 0x0000, 0x003e, 0x003e, 
-  0x0000, 0x0000, 0x003e, 0x003e, 
-  0x0000, 0x0000, 0x003e, 0x003e, 
-  0x0000, 0x0000, 0x001c, 0x001c, 
+  0x0000, 0x0000, 0x001c, 0x001c,
+  0x0000, 0x0000, 0x003e, 0x003e,
+  0x0000, 0x0000, 0x003e, 0x003e,
+  0x0000, 0x0000, 0x003e, 0x003e,
+  0x0000, 0x0000, 0x001c, 0x001c,
 };
 
 static unsigned short snow_flake_mask[] = {
@@ -72,7 +72,7 @@ static unsigned short bg_mask_variants
 static unsigned short fg_mask_variants
 [SNOW_FLAKE_VARIANTS][SNOW_FLAKE_HEIGHT];
 
-static struct snow_flake snow[MAX_SNOW_FLAKES];
+struct snow_flake snow[MAX_SNOW_FLAKES];
 static unsigned short snow_count;
 
 static void reset_snow_flake(struct snow_flake *flake) {
@@ -136,18 +136,47 @@ static void update_snow_flake(struct snow_flake *flake, unsigned short delta) {
   }
 }
 
+static int flake_in_text(struct snow_flake *flake) {
+  unsigned short fl_blk = flake->x_block;
+  unsigned short fl_y = flake->y_pos;
+  if ( (flake->x_block >= TEXT_STARTING_BLOCK) &&
+       (flake->y_pos >= (TEXT_MIN_Y - FLAKE_HEIGHT)) &&
+       (flake->y_pos <= TEXT_MAX_Y) ){ // Are we in the text zone ?
+    for (unsigned short i=0; text_buffer[i] != '\0'; i++) {
+      char chr = text_buffer[i];
+      if ((chr != '\n') && (chr != '#') && (chr != ' ')) {
+        if ((fl_blk == char_block[i]) &&
+            (fl_y >= char_top_y[i]) &&
+            (fl_y < (char_top_y[i] +13))) {
+          return 1;
+        }
+      }
+    }
+  }
+  return 0; // flake not in text
+}
+
 static void display_snow_flake(unsigned short* video_ptr,
                                unsigned short* backsnow_ptr,
                                unsigned short* background_ptr,
                                struct snow_flake *flake) {
-  if ( (flake->y_pos != flake->old_y_pos)
-      || (flake->x_pos != flake->old_x_pos)
-      ) {
+  if ( flake->y_pos != flake->old_y_pos ||
+       flake->x_pos != flake->old_x_pos ){ // Did the flake move ?
+    // We have to update backsnow (To fix later?)
     unsigned short displacement = LINE_WIDTH*flake->y_pos + BIT_PLANES*flake->x_block;
     unsigned short var = flake_sine[flake->x_pos & FLAKE_SINE_MASK];
+    unsigned short update_video_ram = 1; // By default we update the vide RAM
+
+#ifdef FLICKER_REDUCTION
+    if ( flake_in_text(flake) ) { // Are we in behind a character ?
+      update_video_ram = 0; // Don't update video RAM
+    }
+#endif
+
     video_ptr += displacement;
     backsnow_ptr += displacement;
     background_ptr += displacement;
+
     for (unsigned short i=0; i < SNOW_FLAKE_HEIGHT; i++) {
       unsigned short sm = sf_mask_variants[var][i];
       unsigned short bm = bg_mask_variants[var][i];
@@ -162,8 +191,10 @@ static void display_snow_flake(unsigned short* video_ptr,
           unsigned short sp = flake_pic_variants[var][BIT_PLANES*i + j];
           unsigned short bg = background_ptr[j];
           unsigned short fg = video_ptr[j];
-          video_ptr[j] = (sp & sm) | (bg & bm) | (fg & fm);
           backsnow_ptr[j] = (sp & sm) | (bg & ~sm);
+          if ( update_video_ram ) {
+            video_ptr[j] = (sp & sm) | (bg & bm) | (fg & fm);
+          }
         }
       }
       video_ptr += LINE_WIDTH;
