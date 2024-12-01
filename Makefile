@@ -1,6 +1,9 @@
 CFLAGS=-g
 
-all: main.prg
+all: binfile main.prg
+
+binfile:
+	python3 create-img-bin-file.py 
 
 main.prg: main.o misc.o printer.o sprite.o text.o text-opt.o vbl.o snowflake.o
 	vc +tos $(CFLAGS) -o $@ $^
@@ -15,7 +18,7 @@ main.prg: main.o misc.o printer.o sprite.o text.o text-opt.o vbl.o snowflake.o
 	vc +tos -S $(CFLAGS) -o $@ $^
 
 clean:
-	rm -f *.prg *.tos *.o
+	rm -f *.prg *.tos *.o g[0-9]spr.bin
 
 run: main.prg
 	hatari --fast-boot true main.prg
