@@ -1,6 +1,5 @@
 #include "common.h"
 #include "text.h"
-#include "text-opt.h" // Optimisations
 
 // Mask to be used to display font
 unsigned short font_mask[FONT_SIZE];
@@ -81,9 +80,10 @@ unsigned short update_text(unsigned short* video_ptr,
       cur_bg_ptr = background_ptr + d;
     } else {
       if (text_buffer[i] != '#') { // Special character to speed up display
+        unsigned short font_pos = font_position(text_buffer[i]);
         short delta = LINE_WIDTH * text_shift[(i*11+clk) & TEXT_SHIFT_MASK];
         display_character_opt(cur_vd_ptr + delta, cur_bg_ptr + delta,
-                              font_base, text_buffer[i]);
+                              font_base + font_pos, font_mask + font_pos);
       }
       cur_vd_ptr += BIT_PLANES;
       cur_bg_ptr += BIT_PLANES;

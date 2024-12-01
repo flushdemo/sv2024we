@@ -1,4 +1,3 @@
-        xref    _font_mask
         xdef    _display_character_opt
 
         section code
@@ -6,20 +5,10 @@
 _display_character_opt:
 	movem.l	reg_lst, -(a7)
         ;; Retrieving parameters from stack
-	move.w	(18 + reg_cnt, a7), d0  ; chr
-	move.l	(12 + reg_cnt, a7), a6  ; font_base
+	move.l	(16 + reg_cnt, a7), a5  ; mask_ptr
+	move.l	(12 + reg_cnt, a7), a6  ; font_ptr
 	move.l	(8  + reg_cnt, a7), a4  ; background_ptr
 	move.l	(4  + reg_cnt, a7), a3  ; video_ptr
-
-	move.l	d0, -(a7)       ; Only word will be used, but needs long alignment
-	jsr	_font_position
-	addq.w	#4, a7          ; Fix stack
-        lsl.w   #1, d0          ; font_pos * 2 - multiply by 2 cause items are words
-
-	lea	(a6, d0.w), a6  ; font_ptr
-	lea	_font_mask, a5
-	add.w	d0, a5          ; mask_ptr
-        ;; d0 can be reused
 
 	moveq	#15, d7         ; j
 outer_loop:

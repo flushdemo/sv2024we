@@ -24,4 +24,10 @@ void display_picture(unsigned short* video_ptr, unsigned short* picture);
 // Display a font buffer for troubleshooting purpose
 void display_font(unsigned short* video_ptr, unsigned short* font_data);
 
+// Assembly version
+void display_character_opt(unsigned short* video_ptr,
+                           unsigned short* background_ptr,
+                           unsigned short* font_ptr,
+                           unsigned short* mask_ptr);
+
 #endif
