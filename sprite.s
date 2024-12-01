@@ -62,21 +62,9 @@ gnome_show:
 	add.l  #16*160,a5
 	add.l  #16*160,a6
 	move.l #175-1,d2
-	; d1 oqp
-	; d2-d7 ok
-	; d0 ok
-.shw_gnome_msk_frame_0:
-	; 1 block of 16 pixels
-	;movem.l	(a0)+,d2-d4
 
-	; get and apply the mask for the first block of 16 pixels
-	; (4 planes) : a long word get 2 planes.
-	; ; movem.l	(a0)+,d0/d2-d7/a3-a5
-	; ; movem.l	d0/d2-d7/a3-a5,(a1)
-	; ; lea  40(a1),a1
-	; ; movem.l	(a0)+,d2-d5
-	; ; movem.l	d2-d5,(a1)
-	; ; lea  16(a1),a1
+	.shw_gnome_msk_frame_0:
+
 
 	REPT 7
     move.w      (a4),d1		; msk nb
