@@ -50,6 +50,7 @@ v2.2 : 31.37 fps [-24%]  (snowflakes sine move)
 v2.3 : 106.66 fps [240%] (Smart text drawing, i.e only when changing)
 v2.4 : 100 fps   [-6%]   (Update bouding boxes)
 v2.5 : 36.36 fps [-63%]  (Unoptimised implementation of flicker redutcion)
+v2.7 : 20 fps    [-45%]  (Fastest snow flakes + DMA-SC music)
 
 # Memory usage
 
