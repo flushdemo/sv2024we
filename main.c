@@ -153,14 +153,19 @@ int main() {
   long (*soundtrack_deinit) () = (long(*)()) &(sndh_ptr[1]);
   soundtrack_vbl = (long(*)()) &(sndh_ptr[2]);
 
+
   load_picture_or_quit(&background, "ASSETS/FOND.PI1");
   load_font_or_quit(&font, "ASSETS/FONTE.PI1");
+
   load_file(music_buffer, "ASSETS/FXMS2401.SND", MUSIC_BUFFER_SIZE);
+
+  Supexec((void *)disable_conterm);
 
   Supexec(soundtrack_init);
   Supexec(set_music_player_vbl);
 
   hide_mouse();
+
   Setpalette((void*)&(background.palette));
   display_picture(video_ptr, background.picture);
 #ifdef USE_DOUBLE_BUFFER
@@ -177,5 +182,6 @@ int main() {
 
   Supexec(restore_vbl);
   Supexec(soundtrack_deinit);
+  Supexec((void *)enable_conterm);
   show_mouse();
 }
