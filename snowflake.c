@@ -20,7 +20,7 @@ struct snow_flake {
 // [round(4*math.sin(x/32 * 2*math.pi))+4 for x in range(32)]
 static unsigned short flake_sine[] = {
 4, 5, 6, 6, 7, 7, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 2, 1, 1, 0, 0, 0, 0, 0, 1, 1, 2, 2, 3
-}
+};
 
 // 8 lines
 // 4 bit planes
