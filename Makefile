@@ -2,9 +2,6 @@ CFLAGS=-g
 
 all: main.prg
 
-img.prg: img.s
-	vasmm68k_mot -Ftos -o $@ $^
-
 main.prg: main.o misc.o printer.o sprite.o text.o text-opt.o vbl.o snowflake.o
 	vc +tos $(CFLAGS) -o $@ $^
 
