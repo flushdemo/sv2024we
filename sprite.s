@@ -49,19 +49,17 @@ reg_cnt	equ	4*15
 	move.l	(reg_cnt+4,a7),a6       ; video_ptr (address)
 
 gnome_show:
-	and.w	#7,d1
-	lsl.w   #2,d1
-	lea		garray,a2      ; tableau des sprites
-	lea		gmskarray,a3   ; tableau des masques
-	move.l  (a2,d1.w),a0 ; a0 spr
-	move.l	(a3,d1.w),a4 ; a4 msk
+	and.w		#7,d1
+	lsl.w	  	#2,d1
+	lea			garray,a2      ; tableau des sprites
+	lea			gmskarray,a3   ; tableau des masques
+	move.l 	 	(a2,d1.w),a0 ; a0 spr
+	move.l		(a3,d1.w),a4 ; a4 msk
 
 
-	; show gnome frame1 mask
-
-	add.l  #16*160,a5
-	add.l  #16*160,a6
-	move.l #175-1,d2
+	add.l		#16*160,a5
+	add.l 		#16*160,a6
+	move.l		#175-1,d2
 
 	.shw_gnome_msk_frame_0:
 
@@ -71,12 +69,12 @@ gnome_show:
 	swap		d1
 	move.w		(a4),d1
 	move.l		d1,d3
-	and.l       0(a5),d1    ; background bit plane 1 et 2 and mask
-	or.l        0(a0),d1    ; or sprite bit plane 1 et 2
-	move.l		d1,0(a6)    ; a6 ecran a5 background a0 sprite
+	and.l       0(a5),d1    ; background bit plane 1 and 2 and mask
+	or.l        0(a0),d1    ; or sprite bit plane 1 and 2
+	move.l		d1,0(a6)    ; a6 screen a5 background a0 sprite
 
-	and.l		4(a5),d3   ; background bit plane 3 et 4 and mask		
-	or.l        4(a0),d3   ; or sprite bit plane 3 et 4
+	and.l		4(a5),d3   ; background bit plane 3 and 4 and mask
+	or.l        4(a0),d3   ; or sprite bit plane 3 and 4
     move.l		d3,4(a6)
 	
 	addq.l		#8,a0
@@ -85,11 +83,11 @@ gnome_show:
     addq.l      #2,a4
 	ENDR
 	
-	add.l	#160-(7*8),a5        ; 7 blocks of 16pixels
-	add.l	#160-(7*8),a6        ; 7 blocks of 16pixels
-	dbf d2,.shw_gnome_msk_frame_0
+	add.l		#160-(7*8),a5        ; 7 blocks of 16pixels
+	add.l		#160-(7*8),a6        ; 7 blocks of 16pixels
+	dbf 		d2,.shw_gnome_msk_frame_0
 
-	movem.l	(a7)+,d0-d7/a0-a6
+	movem.l		(a7)+,d0-d7/a0-a6
 	rts
 
 	section "DATA",data
@@ -102,13 +100,13 @@ gmskarray	dc.l g0msk, g1msk, g2msk, g3msk
 			dc.l g4msk, g5msk, g6msk, g7msk
 
 g0f			incbin '.\g0spr.bin' ; the data of gnome and background for frame 1
-g1f			incbin '.\g1spr.bin' ; the data of gnome and background for frame 1
-g2f			incbin '.\g2spr.bin' ; the data of gnome and background for frame 1
-g3f			incbin '.\g3spr.bin' ; the data of gnome and background for frame 1
-g4f			incbin '.\g4spr.bin' ; the data of gnome and background for frame 1
-g5f			incbin '.\g5spr.bin' ; the data of gnome and background for frame 1
-g6f			incbin '.\g6spr.bin' ; the data of gnome and background for frame 1
-g7f			incbin '.\g7spr.bin' ; the data of gnome and background for frame 1
+g1f			incbin '.\g1spr.bin' ; the data of gnome and background for frame 2
+g2f			incbin '.\g2spr.bin' ; the data of gnome and background for frame 3
+g3f			incbin '.\g3spr.bin' ; the data of gnome and background for frame 4
+g4f			incbin '.\g4spr.bin' ; the data of gnome and background for frame 5
+g5f			incbin '.\g5spr.bin' ; the data of gnome and background for frame 6
+g6f			incbin '.\g6spr.bin' ; the data of gnome and background for frame 7
+g7f			incbin '.\g7spr.bin' ; the data of gnome and background for frame 8
 
 
         section bss
