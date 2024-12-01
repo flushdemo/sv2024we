@@ -77,7 +77,7 @@ gnome_show:
 	; ; movem.l	(a0)+,d2-d5
 	; ; movem.l	d2-d5,(a1)
 	; ; lea  16(a1),a1
-	;FIXME: need to clean character for each previous frame.
+
 	REPT 7
     move.w      (a4),d1		; msk nb
 	swap		d1
