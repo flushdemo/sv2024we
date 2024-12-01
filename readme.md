@@ -10,12 +10,26 @@ origine x,y (0, 21), largeur,hauteur (96, 160)
 
 # Todo
 
+## Text
+
+- display only when moving
+
 ## Snowflakes drawings
 
-- notion of zones (gnome, text)
 - use backsnow only in sprites zones
 - use only required bitplanes
-- write in assembly
+- critical code in assembly ?
+
+## general
+
+- All assets in a single binary, then in the prg
+- Compress
+
+## gnome
+
+- 1 block xored, 4 blocks precalc, 1 block xored
+- performance tuning
+
 
 # Performance tracking
 
@@ -36,6 +50,7 @@ v1.4 : 38.09 fps [21.4%] (Redraw gnome only when needed) [no double buffer]
 v1.5 : 37.20 fps [-3%]   (Smart snow flakes masks) [no double buffer]
 v1.7 : 47.76 fps [28.4%] (Critical operations on longs instead of words + optim)
 v2.1 : 36.36 fps [-24%]  (Gnome xored with background)
+v2.2 : 31.37 fps [-24%]  (snowflakes sine move)
 
 # Memory usage
 
