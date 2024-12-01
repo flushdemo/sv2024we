@@ -30,4 +30,4 @@ _enable_conterm:
         rts
 
         section bss
-old_conterm     ds.b    1
+old_conterm     ds.w    1
