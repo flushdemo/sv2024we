@@ -2,24 +2,14 @@
 #include "common.h"
 #include "snowflake.h"
 
-#define FLAKE_SINE_MASK 0x1f
-
 struct snow_flake {
+  unsigned short variant;
   unsigned short x_block; // in 0 - 19
   unsigned short x_shift; // left shift in the 16bits block in [0 - 8]
-  unsigned short x_vel; // x velocity
   unsigned short y_vel; // y velocity
-  unsigned short x_pos; // x position on the sine
   unsigned short y_pos; // y position (top of picture)
-  unsigned short old_x_pos; // currently displayed position
   unsigned short old_y_pos; // currently displayed position
-  short x_velcnt;
   short y_velcnt; // counter to implement mouvement
-};
-
-// [round(4*math.sin(x/32 * 2*math.pi))+4 for x in range(32)]
-static unsigned short flake_sine[] = {
-4, 5, 6, 6, 7, 7, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 2, 1, 1, 0, 0, 0, 0, 0, 1, 1, 2, 2, 3
 };
 
 // 8 lines
@@ -46,20 +36,20 @@ static unsigned short snow_flake_mask[] = {
 
 static unsigned short background_mask[] = {
   0x003e,
-  0x0063,
-  0x0041,
-  0x0041,
-  0x0041,
   0x0022,
+  0x0000,
+  0x0000,
+  0x0000,
+  0x0000,
 };
 
 static unsigned short foreground_mask[] = {
   0xffc1,
-  0xff80,
-  0xff80,
-  0xff80,
-  0xff80,
   0xffc1,
+  0xffc1,
+  0xffc1,
+  0xffc1,
+  0xffe3,
 };
 
 // Flakes variants storage
@@ -76,7 +66,7 @@ static struct snow_flake snow[MAX_SNOW_FLAKES];
 static unsigned short snow_count;
 
 static void reset_snow_flake(struct snow_flake *flake) {
-  flake->x_pos = Random() % SNOW_FLAKE_VARIANTS;
+  flake->variant = Random() % SNOW_FLAKE_VARIANTS;
 #ifdef NO_SNOW_ON_GNOME
   flake->x_block = ((Random() % 16) + 5) % SNOW_MAX_X_BLOCK; // flakes in columns 0, 5 -- 19.
 #else
@@ -84,12 +74,9 @@ static void reset_snow_flake(struct snow_flake *flake) {
 #endif
   // Avoid columns 2, 3, center of gnome - too much clipping
   flake->x_shift = Random() % 8;
-  flake->x_vel = (Random() % (MAX_SNOW_VELOCITY-MIN_SNOW_VELOCITY)) + MIN_SNOW_VELOCITY;
   flake->y_vel = (Random() % (MAX_SNOW_VELOCITY-MIN_SNOW_VELOCITY)) + MIN_SNOW_VELOCITY;
   flake->y_pos = 0;
-  flake->old_x_pos = 0;
   flake->old_y_pos = 0;
-  flake->x_velcnt = 0;
   flake->y_velcnt = 0;
 }
 
@@ -121,15 +108,10 @@ void init_snow(void) {
 }
 
 static void update_snow_flake(struct snow_flake *flake, unsigned short delta) {
-  flake->x_velcnt -= delta;
   flake->y_velcnt -= delta;
   while (flake->y_velcnt < 0) {
     flake->y_velcnt += flake->y_vel;
     flake->y_pos++;
-  }
-  while (flake->x_velcnt < 0) {
-    flake->x_velcnt += flake->x_vel;
-    flake->x_pos++;
   }
   if (flake->y_pos > MAX_SNOW_Y) {
     reset_snow_flake(flake);
@@ -140,11 +122,9 @@ static void display_snow_flake(unsigned short* video_ptr,
                                unsigned short* backsnow_ptr,
                                unsigned short* background_ptr,
                                struct snow_flake *flake) {
-  if ( (flake->y_pos != flake->old_y_pos)
-      || (flake->x_pos != flake->old_x_pos)
-      ) {
+  if (flake->y_pos != flake->old_y_pos) {
     unsigned short displacement = LINE_WIDTH*flake->y_pos + BIT_PLANES*flake->x_block;
-    unsigned short var = flake_sine[flake->x_pos & FLAKE_SINE_MASK];
+    unsigned short var = flake->variant;
     video_ptr += displacement;
     backsnow_ptr += displacement;
     background_ptr += displacement;
@@ -170,7 +150,6 @@ static void display_snow_flake(unsigned short* video_ptr,
       backsnow_ptr += LINE_WIDTH;
       background_ptr += LINE_WIDTH;
     }
-    flake->old_x_pos = flake->x_pos;
     flake->old_y_pos = flake->y_pos;
   }
 }

@@ -10,26 +10,12 @@ origine x,y (0, 21), largeur,hauteur (96, 160)
 
 # Todo
 
-## Text
-
-- display only when moving
-
 ## Snowflakes drawings
 
+- notion of zones (gnome, text)
 - use backsnow only in sprites zones
 - use only required bitplanes
-- critical code in assembly ?
-
-## general
-
-- All assets in a single binary, then in the prg
-- Compress
-
-## gnome
-
-- 1 block xored, 4 blocks precalc, 1 block xored
-- performance tuning
-
+- write in assembly
 
 # Performance tracking
 
