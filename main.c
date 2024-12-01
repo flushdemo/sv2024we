@@ -24,7 +24,6 @@
 #define DEGAS_FILE_SIZE 32034 // Degas picture format in bytes
 // FONT_SIZE is in 16bit blocks, while FONT_FILE_SIZE is in bytes.
 #define FONT_FILE_SIZE (34 + FONT_SIZE*2) // 34 for Degas header
-#define TEXT_BUFFER_SIZE 256
 #define MUSIC_BUFFER_SIZE 32768
 
 // Text zone constants

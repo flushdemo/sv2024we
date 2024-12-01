@@ -51,6 +51,7 @@ v1.5 : 37.20 fps [-3%]   (Smart snow flakes masks) [no double buffer]
 v1.7 : 47.76 fps [28.4%] (Critical operations on longs instead of words + optim)
 v2.1 : 36.36 fps [-24%]  (Gnome xored with background)
 v2.2 : 31.37 fps [-24%]  (snowflakes sine move)
+v2.3 : 106.66 fps [240%] (Smart text drawing, i.e only when changing)
 
 # Memory usage
 

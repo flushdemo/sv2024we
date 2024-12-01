@@ -15,4 +15,7 @@
 // Gnome constants
 #define GNOME_WIDTH 7 // in 16 bits blocks
 
+// Text constants
+#define TEXT_BUFFER_SIZE 256
+
 #endif

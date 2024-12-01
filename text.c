@@ -67,6 +67,9 @@ unsigned short update_text(unsigned short* video_ptr,
                            unsigned short* font_base,
                            const char* text_buffer,
                            unsigned short clk) {
+  static short old_delta[TEXT_BUFFER_SIZE];
+  static short old_text[TEXT_BUFFER_SIZE];
+
   unsigned short ln_count = 0;
   unsigned short* cur_vd_ptr = video_ptr;
   unsigned short* cur_bg_ptr = background_ptr;
@@ -80,10 +83,14 @@ unsigned short update_text(unsigned short* video_ptr,
       cur_bg_ptr = background_ptr + d;
     } else {
       if (text_buffer[i] != '#') { // Special character to speed up display
-        unsigned short font_pos = font_position(text_buffer[i]);
         short delta = LINE_WIDTH * text_shift[(i*11+clk) & TEXT_SHIFT_MASK];
-        display_character_opt(cur_vd_ptr + delta, cur_bg_ptr + delta,
-                              font_base + font_pos, font_mask + font_pos);
+        if (old_delta[i] != delta || old_text[i] != text_buffer[i]) { // Did we change anything ?
+          unsigned short font_pos = font_position(text_buffer[i]);
+          display_character_opt(cur_vd_ptr + delta, cur_bg_ptr + delta,
+                                font_base + font_pos, font_mask + font_pos);
+          old_delta[i] = delta;
+          old_text[i] = text_buffer[i];
+        }
       }
       cur_vd_ptr += BIT_PLANES;
       cur_bg_ptr += BIT_PLANES;
