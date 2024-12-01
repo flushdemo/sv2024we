@@ -10,14 +10,10 @@ origine x,y (0, 21), largeur,hauteur (96, 160)
 
 # Todo
 
-## Text
-
-- display only when moving
-
 ## Snowflakes drawings
 
-- use backsnow only in sprites zones
-- use only required bitplanes
+- use 4 different sprites
+- use only required bitplanes ?
 - critical code in assembly ?
 
 ## general

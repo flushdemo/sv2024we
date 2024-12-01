@@ -153,9 +153,9 @@ int main() {
   long (*soundtrack_deinit) () = (long(*)()) &(sndh_ptr[1]);
   soundtrack_vbl = (long(*)()) &(sndh_ptr[2]);
 
-  load_picture_or_quit(&background, "FOND.PI1");
-  load_font_or_quit(&font, "FONTE.PI1");
-  load_file(music_buffer, "MUSIC.SND", MUSIC_BUFFER_SIZE);
+  load_picture_or_quit(&background, "ASSETS/FOND.PI1");
+  load_font_or_quit(&font, "ASSETS/FONTE.PI1");
+  load_file(music_buffer, "ASSETS/TESTMSX.SND", MUSIC_BUFFER_SIZE);
 
   Supexec(soundtrack_init);
   Supexec(set_music_player_vbl);
