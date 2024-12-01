@@ -18,6 +18,8 @@ struct snow_flake {
 // 8 bits LSB used
 static unsigned short snow_flake_pic[] = {
   0x0000, 0x0000, 0x0000, 0x0000,
+  0x0000, 0x0000, 0x0000, 0x0000,
+  0x0000, 0x0000, 0x0000, 0x0000,
   0x0000, 0x0000, 0x001c, 0x001c, 
   0x0000, 0x0000, 0x003e, 0x003e, 
   0x0000, 0x0000, 0x003e, 0x003e, 
@@ -26,6 +28,8 @@ static unsigned short snow_flake_pic[] = {
 };
 
 static unsigned short snow_flake_mask[] = {
+  0x0000,
+  0x0000,
   0x0000,
   0x001c,
   0x003e,
@@ -36,6 +40,8 @@ static unsigned short snow_flake_mask[] = {
 
 static unsigned short background_mask[] = {
   0x003e,
+  0x003e,
+  0x003e,
   0x0022,
   0x0000,
   0x0000,
@@ -44,6 +50,8 @@ static unsigned short background_mask[] = {
 };
 
 static unsigned short foreground_mask[] = {
+  0xffc1,
+  0xffc1,
   0xffc1,
   0xffc1,
   0xffc1,
@@ -74,7 +82,7 @@ static void reset_snow_flake(struct snow_flake *flake) {
 #endif
   // Avoid columns 2, 3, center of gnome - too much clipping
   flake->x_shift = Random() % 8;
-  flake->y_vel = (Random() % (MAX_SNOW_VELOCITY-MIN_SNOW_VELOCITY)) + MIN_SNOW_VELOCITY;
+  flake->y_vel = Random() % (MAX_SNOW_VELOCITY-MIN_SNOW_VELOCITY+1) + MIN_SNOW_VELOCITY;
   flake->y_pos = 0;
   flake->old_y_pos = 0;
   flake->y_velcnt = 0;
@@ -133,7 +141,7 @@ static void display_snow_flake(unsigned short* video_ptr,
       unsigned short bm = bg_mask_variants[var][i];
       unsigned short fm = fg_mask_variants[var][i];
       for (unsigned short j=0; j < BIT_PLANES; j++) {
-        if (flake->y_pos > (MAX_SNOW_Y - 1)) {
+        if (flake->y_pos > (MAX_SNOW_Y - SNOW_CLEAR_AREA)) {
           // Clean snow flake
           video_ptr[j] = background_ptr[j];
           backsnow_ptr[j] = background_ptr[j];
