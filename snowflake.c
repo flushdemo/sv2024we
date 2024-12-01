@@ -84,8 +84,8 @@ static void reset_snow_flake(struct snow_flake *flake) {
 #endif
   // Avoid columns 2, 3, center of gnome - too much clipping
   flake->x_shift = Random() % 8;
-  flake->x_vel = (Random() % (MAX_SNOW_VELOCITY-MIN_SNOW_VELOCITY)) + MIN_SNOW_VELOCITY;
-  flake->y_vel = (Random() % (MAX_SNOW_VELOCITY-MIN_SNOW_VELOCITY)) + MIN_SNOW_VELOCITY;
+  flake->x_vel = (Random() % (MAX_SNOW_X_VELOCITY-MIN_SNOW_X_VELOCITY)) + MIN_SNOW_X_VELOCITY;
+  flake->y_vel = (Random() % (MAX_SNOW_Y_VELOCITY-MIN_SNOW_Y_VELOCITY)) + MIN_SNOW_Y_VELOCITY;
   flake->y_pos = 0;
   flake->old_x_pos = 0;
   flake->old_y_pos = 0;
