@@ -28,6 +28,7 @@ static unsigned short flake_sine[] = {
 // 8 bits LSB used
 static unsigned short snow_flake_pic[] = {
   0x0000, 0x0000, 0x0000, 0x0000,
+  0x0000, 0x0000, 0x0000, 0x0000,
   0x0000, 0x0000, 0x001c, 0x001c,
   0x0000, 0x0000, 0x003e, 0x003e,
   0x0000, 0x0000, 0x003e, 0x003e,
@@ -36,6 +37,7 @@ static unsigned short snow_flake_pic[] = {
 };
 
 static unsigned short snow_flake_mask[] = {
+  0x0000,
   0x0000,
   0x001c,
   0x003e,
@@ -46,6 +48,7 @@ static unsigned short snow_flake_mask[] = {
 
 static unsigned short background_mask[] = {
   0x003e,
+  0x003e,
   0x0063,
   0x0041,
   0x0041,
@@ -54,6 +57,7 @@ static unsigned short background_mask[] = {
 };
 
 static unsigned short foreground_mask[] = {
+  0xffc1,
   0xffc1,
   0xff80,
   0xff80,
@@ -182,7 +186,7 @@ static void display_snow_flake(unsigned short* video_ptr,
       unsigned short bm = bg_mask_variants[var][i];
       unsigned short fm = fg_mask_variants[var][i];
       for (unsigned short j=0; j < BIT_PLANES; j++) {
-        if (flake->y_pos > (MAX_SNOW_Y - 1)) {
+        if (flake->y_pos > (MAX_SNOW_Y - SNOW_CLEAR_ZONE)) {
           // Clean snow flake
           video_ptr[j] = background_ptr[j];
           backsnow_ptr[j] = background_ptr[j];
