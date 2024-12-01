@@ -79,7 +79,7 @@ static unsigned short fg_mask_variants
 struct snow_flake snow[MAX_SNOW_FLAKES];
 static unsigned short snow_count;
 
-static void reset_snow_flake(struct snow_flake *flake) {
+void reset_snow_flake(struct snow_flake *flake) {
   flake->x_pos = Random() % SNOW_FLAKE_VARIANTS;
 #ifdef NO_SNOW_ON_GNOME
   flake->x_block = ((Random() % 16) + 5) % SNOW_MAX_X_BLOCK; // flakes in columns 0, 5 -- 19.
@@ -97,7 +97,7 @@ static void reset_snow_flake(struct snow_flake *flake) {
   flake->y_velcnt = 0;
 }
 
-static void init_snow_flake(struct snow_flake *flake) {
+void init_snow_flake(struct snow_flake *flake) {
   reset_snow_flake(flake);
   flake->y_pos = Random() % MAX_SNOW_Y;
 }
@@ -105,7 +105,7 @@ static void init_snow_flake(struct snow_flake *flake) {
 void compute_flake_variants(void) {
   for (unsigned short v=0; v<SNOW_FLAKE_VARIANTS; v++) {
     for (unsigned short h=0; h<SNOW_FLAKE_HEIGHT; h++) {
-      sf_mask_variants[v][h] = snow_flake_mask[h] << (v * (8 / (SNOW_FLAKE_VARIANTS-1)));
+      sf_mask_variants[v][h] = ~(snow_flake_mask[h] << (v * (8 / (SNOW_FLAKE_VARIANTS-1)))); // precompute not
       bg_mask_variants[v][h] = background_mask[h] << (v * (8 / (SNOW_FLAKE_VARIANTS-1)));
       fg_mask_variants[v][h] = (foreground_mask[h] << (v * (8 / (SNOW_FLAKE_VARIANTS-1))))
         | ((1 << (v * (8 / (SNOW_FLAKE_VARIANTS-1)))) - 1); // fill the right with ones
@@ -124,7 +124,7 @@ void init_snow(void) {
   }
 }
 
-static void update_snow_flake(struct snow_flake *flake, unsigned short delta) {
+void update_snow_flake(struct snow_flake *flake, unsigned short delta) {
   flake->x_velcnt -= delta;
   flake->y_velcnt -= delta;
   while (flake->y_velcnt < 0) {
@@ -140,7 +140,7 @@ static void update_snow_flake(struct snow_flake *flake, unsigned short delta) {
   }
 }
 
-static int flake_in_text(struct snow_flake *flake) {
+int flake_in_text(struct snow_flake *flake) {
   unsigned short fl_blk = flake->x_block;
   unsigned short fl_y = flake->y_pos;
   if ( (flake->x_block >= TEXT_STARTING_BLOCK) &&
@@ -160,7 +160,42 @@ static int flake_in_text(struct snow_flake *flake) {
   return 0; // flake not in text
 }
 
-static void display_snow_flake(unsigned short* video_ptr,
+void display_flake_sprite(unsigned short* video_ptr,
+                          unsigned short* backsnow_ptr,
+                          unsigned short* background_ptr,
+                          unsigned short* flake_pic,
+                          unsigned short* flake_mask,
+                          unsigned short* background_mask,
+                          unsigned short* foreground_mask,
+                          unsigned short flake_y_pos,
+                          unsigned short update_video_ram){
+  for (unsigned short i=0; i < SNOW_FLAKE_HEIGHT; i++) {
+    unsigned short sm = flake_mask[i];
+    unsigned short bm = background_mask[i];
+    unsigned short fm = foreground_mask[i];
+    for (unsigned short j=0; j < BIT_PLANES; j++) {
+      if (flake_y_pos > (MAX_SNOW_Y - SNOW_CLEAR_ZONE)) {
+        // Clean snow flake
+        video_ptr[j] = background_ptr[j];
+        backsnow_ptr[j] = background_ptr[j];
+      }
+      else { // Draw snow flake
+        unsigned short sp = flake_pic[BIT_PLANES*i + j];
+        unsigned short bg = background_ptr[j];
+        unsigned short fg = video_ptr[j];
+        backsnow_ptr[j] = sp | (bg & sm);
+        if ( update_video_ram ) {
+          video_ptr[j] = sp | (bg & bm) | (fg & fm);
+        }
+      }
+    }
+    video_ptr += LINE_WIDTH;
+    backsnow_ptr += LINE_WIDTH;
+    background_ptr += LINE_WIDTH;
+  }
+}
+
+void display_snow_flake(unsigned short* video_ptr,
                                unsigned short* backsnow_ptr,
                                unsigned short* background_ptr,
                                struct snow_flake *flake) {
@@ -181,30 +216,16 @@ static void display_snow_flake(unsigned short* video_ptr,
     backsnow_ptr += displacement;
     background_ptr += displacement;
 
-    for (unsigned short i=0; i < SNOW_FLAKE_HEIGHT; i++) {
-      unsigned short sm = sf_mask_variants[var][i];
-      unsigned short bm = bg_mask_variants[var][i];
-      unsigned short fm = fg_mask_variants[var][i];
-      for (unsigned short j=0; j < BIT_PLANES; j++) {
-        if (flake->y_pos > (MAX_SNOW_Y - SNOW_CLEAR_ZONE)) {
-          // Clean snow flake
-          video_ptr[j] = background_ptr[j];
-          backsnow_ptr[j] = background_ptr[j];
-        }
-        else { // Draw snow flake
-          unsigned short sp = flake_pic_variants[var][BIT_PLANES*i + j];
-          unsigned short bg = background_ptr[j];
-          unsigned short fg = video_ptr[j];
-          backsnow_ptr[j] = (sp & sm) | (bg & ~sm);
-          if ( update_video_ram ) {
-            video_ptr[j] = (sp & sm) | (bg & bm) | (fg & fm);
-          }
-        }
-      }
-      video_ptr += LINE_WIDTH;
-      backsnow_ptr += LINE_WIDTH;
-      background_ptr += LINE_WIDTH;
-    }
+    display_flake_sprite(video_ptr,
+                         backsnow_ptr,
+                         background_ptr,
+                         flake_pic_variants[var],
+                         sf_mask_variants[var],
+                         bg_mask_variants[var],
+                         fg_mask_variants[var],
+                         flake->y_pos,
+                         update_video_ram);
+
     flake->old_x_pos = flake->x_pos;
     flake->old_y_pos = flake->y_pos;
   }
