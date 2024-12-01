@@ -16,11 +16,6 @@ loop_index_spr:
     move.l      #9800/8-1,d6 ; 175 lines of 56 bytes (7 * 8 bytes (16 pixels * 4 planes))
 
 loop_msk_compute:
-    moveq.l     #0,d1
-    moveq.l     #0,d2
-    moveq.l     #0,d3
-    moveq.l     #0,d4
-
 
 ; 1 block of 16 pixels
 	move.w      0(a4),d1
