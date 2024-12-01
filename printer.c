@@ -8,7 +8,7 @@ static char *talking[] = {
   " HOWDY FOLKS\n\nWE ARE BACK @\n\nSILLY VENTURE",
   " WE WISH YOU\n\n ALL A MERRY\n\n  CHRISTMAS",
   "ALSO YOU ARE\n\n INVITED TO\n\nSHADOW PARTY",
-  " GFX EXOCET\n\n   MSX DMA\n\nCDX FLEW/MARA",
+  " GFX EXOCET\n\n MSX DMA-SC\n\nCDX FLEW/MARA",
   ""
 };
 
