@@ -24,7 +24,7 @@
 #define DEGAS_FILE_SIZE 32034 // Degas picture format in bytes
 // FONT_SIZE is in 16bit blocks, while FONT_FILE_SIZE is in bytes.
 #define FONT_FILE_SIZE (34 + FONT_SIZE*2) // 34 for Degas header
-#define MUSIC_BUFFER_SIZE 32768
+#define MUSIC_BUFFER_SIZE 42500
 
 // Misc
 #define GNOME_SPEED 5
@@ -155,7 +155,7 @@ int main() {
 
   load_picture_or_quit(&background, "ASSETS/FOND.PI1");
   load_font_or_quit(&font, "ASSETS/FONTE.PI1");
-  load_file(music_buffer, "ASSETS/TESTMSX.SND", MUSIC_BUFFER_SIZE);
+  load_file(music_buffer, "ASSETS/FXMS2401.SND", MUSIC_BUFFER_SIZE);
 
   Supexec(soundtrack_init);
   Supexec(set_music_player_vbl);
