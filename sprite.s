@@ -2,6 +2,10 @@
 	public	_init_sprite
 	public	_update_sprite
 
+GNOME_OFFSET  = 21              ; lines
+GNOME_NBLINES = 160             ; lines
+GNOME_NBLOCKS = 6               ; 16bits blocks
+
 _init_sprite:
     movem.l     d0-d7/a0-a6,-(a7)
     ; collect the palette data
@@ -13,7 +17,7 @@ _init_sprite:
 loop_index_spr:
     move.l      (a6)+,a4     ; a4 pointer to sprite
     move.l      (a5)+,a3     ; a3 pointer to computed mask
-    move.l      #9800/8-1,d6 ; 175 lines of 56 bytes (7 * 8 bytes (16 pixels * 4 planes))
+    move.l      #(GNOME_NBLINES*GNOME_NBLOCKS-1),d6 ; blocks count
 
 loop_msk_compute:
 
@@ -57,14 +61,14 @@ gnome_show:
 	move.l		(a3,d1.w),a4 ; a4 msk
 
 
-	add.l		#16*160,a5
-	add.l 		#16*160,a6
-	move.l		#175-1,d2
+	add.l		#GNOME_OFFSET*160,a5
+	add.l 		#GNOME_OFFSET*160,a6
+	move.l		#GNOME_NBLINES-1,d2
 
 	.shw_gnome_msk_frame_0:
 
 
-	REPT 7
+	REPT GNOME_NBLOCKS
     move.w      (a4),d1		; msk nb
 	swap		d1
 	move.w		(a4),d1
@@ -83,8 +87,8 @@ gnome_show:
     addq.l      #2,a4
 	ENDR
 	
-	add.l		#160-(7*8),a5        ; 7 blocks of 16pixels
-	add.l		#160-(7*8),a6        ; 7 blocks of 16pixels
+	add.l		#160-(GNOME_NBLOCKS*8),a5        ; next line
+	add.l		#160-(GNOME_NBLOCKS*8),a6        ; as well
 	dbf 		d2,.shw_gnome_msk_frame_0
 
 	movem.l		(a7)+,d0-d7/a0-a6

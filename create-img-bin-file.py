@@ -16,9 +16,9 @@ PALETTE_SIZE_IN_BYTES = (WORD_SIZE*PALETTE_SIZE) + DEGAS_MARKER_SIZE
 PICTURE_INDEX = PALETTE_SIZE_IN_BYTES
 
 # Sprite Elements
-NB_BLOCK_COPY = 7
-NB_LINES_TO_COPY = 175
-POSITION_LINE_SPRITE = 16*160
+NB_BLOCK_COPY = 6
+NB_LINES_TO_COPY = 160
+POSITION_LINE_SPRITE = 21*SCREEN_WIDTH_IN_BYTES
 BLOCK_SIZE = 8
 
 pi1_list = [
@@ -38,8 +38,6 @@ for file_index in range(nb_files_to_process):
 
   palette = picture_file[PALETTE_INDEX:PALETTE_SIZE_IN_BYTES]
   picture = picture_file[PICTURE_INDEX:SCREEN_SIZE_IN_BYTES]
-
-  POSITION_LINE_SPRITE = 16*SCREEN_WIDTH_IN_BYTES
 
   with open(bin_list[file_index], "wb") as outfile:
       for i in range(NB_LINES_TO_COPY):
