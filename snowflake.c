@@ -167,27 +167,35 @@ void display_flake_sprite(unsigned short* video_ptr,
                           unsigned short* flake_mask,
                           unsigned short* background_mask,
                           unsigned short* foreground_mask,
-                          unsigned short flake_y_pos,
-                          unsigned short update_video_ram){
+                          unsigned short foreground_flake) {
   for (unsigned short i=0; i < SNOW_FLAKE_HEIGHT; i++) {
     unsigned short sm = flake_mask[i];
     unsigned short bm = background_mask[i];
     unsigned short fm = foreground_mask[i];
+
     for (unsigned short j=0; j < BIT_PLANES; j++) {
-      if (flake_y_pos > (MAX_SNOW_Y - SNOW_CLEAR_ZONE)) {
-        // Clean snow flake
-        video_ptr[j] = background_ptr[j];
-        backsnow_ptr[j] = background_ptr[j];
+      unsigned short sp = flake_pic[j];
+      unsigned short bg = background_ptr[j];
+      backsnow_ptr[j] = sp | (bg & sm);
+      if (foreground_flake) {
+        video_ptr[j] = sp | (bg & bm) | (video_ptr[j] & fm);
       }
-      else { // Draw snow flake
-        unsigned short sp = flake_pic[BIT_PLANES*i + j];
-        unsigned short bg = background_ptr[j];
-        unsigned short fg = video_ptr[j];
-        backsnow_ptr[j] = sp | (bg & sm);
-        if ( update_video_ram ) {
-          video_ptr[j] = sp | (bg & bm) | (fg & fm);
-        }
-      }
+    }
+
+    flake_pic += BIT_PLANES;
+    video_ptr += LINE_WIDTH;
+    backsnow_ptr += LINE_WIDTH;
+    background_ptr += LINE_WIDTH;
+  }
+}
+
+void clear_flake_sprite(unsigned short* video_ptr,
+                        unsigned short* backsnow_ptr,
+                        unsigned short* background_ptr) {
+  for (unsigned short i=0; i < SNOW_FLAKE_HEIGHT; i++) {
+    for (unsigned short j=0; j < BIT_PLANES; j++) {
+      video_ptr[j] = background_ptr[j];
+      backsnow_ptr[j] = background_ptr[j];
     }
     video_ptr += LINE_WIDTH;
     backsnow_ptr += LINE_WIDTH;
@@ -196,38 +204,44 @@ void display_flake_sprite(unsigned short* video_ptr,
 }
 
 void display_snow_flake(unsigned short* video_ptr,
-                               unsigned short* backsnow_ptr,
-                               unsigned short* background_ptr,
-                               struct snow_flake *flake) {
+                        unsigned short* backsnow_ptr,
+                        unsigned short* background_ptr,
+                        struct snow_flake *flake) {
   if ( flake->y_pos != flake->old_y_pos ||
        flake->x_pos != flake->old_x_pos ){ // Did the flake move ?
-    // We have to update backsnow (To fix later?)
+
+    // Position pointers at flake location
     unsigned short displacement = LINE_WIDTH*flake->y_pos + BIT_PLANES*flake->x_block;
-    unsigned short var = flake_sine[flake->x_pos & FLAKE_SINE_MASK];
-    unsigned short update_video_ram = 1; // By default we update the vide RAM
-
-#ifdef FLICKER_REDUCTION
-    if ( flake_in_text(flake) ) { // Are we in behind a character ?
-      update_video_ram = 0; // Don't update video RAM
-    }
-#endif
-
     video_ptr += displacement;
     backsnow_ptr += displacement;
     background_ptr += displacement;
 
-    display_flake_sprite(video_ptr,
-                         backsnow_ptr,
-                         background_ptr,
-                         flake_pic_variants[var],
-                         sf_mask_variants[var],
-                         bg_mask_variants[var],
-                         fg_mask_variants[var],
-                         flake->y_pos,
-                         update_video_ram);
+    if (flake->y_pos > (MAX_SNOW_Y - SNOW_CLEAR_ZONE)) { // Too low ?
+      clear_flake_sprite(video_ptr, backsnow_ptr, background_ptr);
+    }
+    else {
+      // We have to update backsnow (To fix later?)
+      unsigned short var = flake_sine[flake->x_pos & FLAKE_SINE_MASK];
+      unsigned short update_video_ram = 1; // By default we update the vide RAM
 
-    flake->old_x_pos = flake->x_pos;
-    flake->old_y_pos = flake->y_pos;
+#ifdef FLICKER_REDUCTION
+      if ( flake_in_text(flake) ) { // Are we in behind a character ?
+        update_video_ram = 0; // Don't update video RAM
+      }
+#endif
+
+      display_flake_sprite_opt(video_ptr,
+                               backsnow_ptr,
+                               background_ptr,
+                               flake_pic_variants[var],
+                               sf_mask_variants[var],
+                               bg_mask_variants[var],
+                               fg_mask_variants[var],
+                               update_video_ram);
+
+      flake->old_x_pos = flake->x_pos;
+      flake->old_y_pos = flake->y_pos;
+    }
   }
 }
 
