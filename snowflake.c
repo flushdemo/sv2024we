@@ -69,11 +69,11 @@ static unsigned short foreground_mask[] = {
 // Flakes variants storage
 static unsigned short flake_pic_variants
 [SNOW_FLAKE_VARIANTS][BIT_PLANES * SNOW_FLAKE_HEIGHT];
-static unsigned short sf_mask_variants
+static unsigned long sf_mask_variants
 [SNOW_FLAKE_VARIANTS][SNOW_FLAKE_HEIGHT];
-static unsigned short bg_mask_variants
+static unsigned long bg_mask_variants
 [SNOW_FLAKE_VARIANTS][SNOW_FLAKE_HEIGHT];
-static unsigned short fg_mask_variants
+static unsigned long fg_mask_variants
 [SNOW_FLAKE_VARIANTS][SNOW_FLAKE_HEIGHT];
 
 struct snow_flake snow[MAX_SNOW_FLAKES];
@@ -103,12 +103,16 @@ void init_snow_flake(struct snow_flake *flake) {
 }
 
 void compute_flake_variants(void) {
+  unsigned short step = 8 / (SNOW_FLAKE_VARIANTS - 1);
   for (unsigned short v=0; v<SNOW_FLAKE_VARIANTS; v++) {
     for (unsigned short h=0; h<SNOW_FLAKE_HEIGHT; h++) {
-      sf_mask_variants[v][h] = ~(snow_flake_mask[h] << (v * (8 / (SNOW_FLAKE_VARIANTS-1)))); // precompute not
-      bg_mask_variants[v][h] = background_mask[h] << (v * (8 / (SNOW_FLAKE_VARIANTS-1)));
-      fg_mask_variants[v][h] = (foreground_mask[h] << (v * (8 / (SNOW_FLAKE_VARIANTS-1))))
-        | ((1 << (v * (8 / (SNOW_FLAKE_VARIANTS-1)))) - 1); // fill the right with ones
+      sf_mask_variants[v][h] = ~(snow_flake_mask[h] << (v * step)); // precompute not
+      sf_mask_variants[v][h] = (sf_mask_variants[v][h] << 16) | (sf_mask_variants[v][h] & 0xffff);
+      bg_mask_variants[v][h] = background_mask[h] << (v * step);
+      bg_mask_variants[v][h] = (bg_mask_variants[v][h] << 16) | (bg_mask_variants[v][h] & 0xffff);
+      fg_mask_variants[v][h] = (foreground_mask[h] << (v * step)) | ((1 << (v * step)) - 1); // fill the right with ones
+      fg_mask_variants[v][h] = (fg_mask_variants[v][h] << 16) | (fg_mask_variants[v][h] & 0xffff);
+
       for (unsigned short b=0; b<BIT_PLANES; b++) {
         flake_pic_variants[v][h*BIT_PLANES+b] = snow_flake_pic[h*BIT_PLANES+b] << (v * (8 / (SNOW_FLAKE_VARIANTS-1)));
       }

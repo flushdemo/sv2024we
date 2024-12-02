@@ -15,12 +15,6 @@ _display_flake_sprite_opt:
 	move.l	( 8 + regsf_cnt, a7), a1 ; backsnow_ptr
 	move.l	( 4 + regsf_cnt, a7), a0 ; video_ptr
 
-        MACRO DUPLICATE_WORD_UPPER
-        move.w  \1, d0
-        swap    \1
-        move.w  d0, \1
-        ENDM
-
 ;;; Inner loop
         MACRO APPLY_FLAKE_MASK
         move.l  (\1, a3), d2    ; sp
@@ -48,12 +42,9 @@ _display_flake_sprite_opt:
 
 ;;; Outer loop
         REPT    ASM_SNOW_FLAKE_HEIGHT
-        move.w  (2*REPTN, a4), d5  ; sm
-        DUPLICATE_WORD_UPPER d5
-        move.w  (2*REPTN, a5), d4  ; bm
-        DUPLICATE_WORD_UPPER d4
-        move.w  (2*REPTN, a6), d3  ; fm
-        DUPLICATE_WORD_UPPER d3
+        move.l  (4*REPTN, a4), d5  ; sm
+        move.l  (4*REPTN, a5), d4  ; bm
+        move.l  (4*REPTN, a6), d3  ; fm
 
         APPLY_FLAKE_MASK 0
         APPLY_FLAKE_MASK 4
