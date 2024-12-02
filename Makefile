@@ -6,7 +6,7 @@ binfile:
 	python3 create-img-bin-file.py 
 
 main.prg: main_raw.prg
-	upx -o $@ $<
+	upx --force-overwrite -o $@ $<
 
 main_raw.prg: main.o misc.o printer.o sprite.o text.o text-opt.o vbl.o snowflake.o snowflake-opt.o assets.o
 	vc +tos $(CFLAGS) -o $@ $^
