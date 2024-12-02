@@ -20,11 +20,6 @@ origine x,y (0, 21), largeur,hauteur (96, 160)
 - use only required bitplanes ?
 - critical code in assembly ?
 
-## general
-
-- All assets in a single binary, then in the prg
-- Compress
-
 ## gnome
 
 - 1 block xored, 4 blocks precalc, 1 block xored
