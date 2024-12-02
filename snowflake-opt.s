@@ -15,27 +15,33 @@ _display_flake_sprite_opt:
 	move.l	( 8 + regsf_cnt, a7), a1 ; backsnow_ptr
 	move.l	( 4 + regsf_cnt, a7), a0 ; video_ptr
 
+        MACRO DUPLICATE_WORD_UPPER
+        move.w  \1, d0
+        swap    \1
+        move.w  d0, \1
+        ENDM
+
 ;;; Inner loop
         MACRO APPLY_FLAKE_MASK
-        move.w  (\1, a3), d2    ; sp
-        move.w  (\1, a2), d1    ; bg
+        move.l  (\1, a3), d2    ; sp
+        move.l  (\1, a2), d1    ; bg
 
-        move.w  d5, d0          ; sm
-        and.w   d1, d0          ; bg & sm
-        or.w    d2, d0          ; sp | (bg & sm)
-        move.w  d0, (\1, a1)    ; -> backsnow_ptr[j]
+        move.l  d5, d0          ; sm
+        and.l   d1, d0          ; bg & sm
+        or.l    d2, d0          ; sp | (bg & sm)
+        move.l  d0, (\1, a1)    ; -> backsnow_ptr[j]
 
         ;; Drawing foreground or not ?
         tst.w   d6
         beq     \@_end_inner_loop
 
         ;; reusing d1
-        and.w   d4, d1          ; bg & bm
-        or.w    d2, d1          ; sp | (bg & bm)
-        move.w  (\1, a0), d0    ; video_ptr[j]
-        and.w   d3, d0          ; video_ptr[j] & fm
-        or.w    d1, d0          ; (sp | (bg & bm)) | (video_ptr[j] & fm)
-        move.w  d0, (\1, a0)    ; -> video_ptr[j]
+        and.l   d4, d1          ; bg & bm
+        or.l    d2, d1          ; sp | (bg & bm)
+        move.l  (\1, a0), d0    ; video_ptr[j]
+        and.l   d3, d0          ; video_ptr[j] & fm
+        or.l    d1, d0          ; (sp | (bg & bm)) | (video_ptr[j] & fm)
+        move.l  d0, (\1, a0)    ; -> video_ptr[j]
 \@_end_inner_loop:
         ENDM
 ;;; Inner loop
@@ -43,13 +49,14 @@ _display_flake_sprite_opt:
 ;;; Outer loop
         REPT    ASM_SNOW_FLAKE_HEIGHT
         move.w  (2*REPTN, a4), d5  ; sm
+        DUPLICATE_WORD_UPPER d5
         move.w  (2*REPTN, a5), d4  ; bm
+        DUPLICATE_WORD_UPPER d4
         move.w  (2*REPTN, a6), d3  ; fm
+        DUPLICATE_WORD_UPPER d3
 
         APPLY_FLAKE_MASK 0
-        APPLY_FLAKE_MASK 2
         APPLY_FLAKE_MASK 4
-        APPLY_FLAKE_MASK 6
 
         ;; Increase pointers
 	add.l	  #8, a3
