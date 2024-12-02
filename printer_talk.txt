@@ -1,5 +1,5 @@
 \50
-flush n co
+flush / meuh
 presents
 atarimas 2024
 
@@ -34,27 +34,31 @@ greetings
 fly to
 
 \0
+asmtariste
 booz design
 cookie crew
-dentifrice
 
 \0
-dfs, dune
+dentifrice
+dfs
+dune
+
+\0
 gen. project
 hemoroids
+mjj prod
 
 \0
-mjj prod
 mystic bytes
 overlanders
+rbbs
 
 \0
-rbbs
 replicants
 sector one
+st knights
 
 \0
-st knights
 up rough
 x-men
 
