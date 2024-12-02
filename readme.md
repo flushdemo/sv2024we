@@ -8,6 +8,12 @@ Pour lire les image .pi1, utiliser grafx2 sous Linux.
 
 origine x,y (0, 21), largeur,hauteur (96, 160)
 
+## Groupes a greetz inconnus
+
+asmtariste ??
+meuh ??
+make runm ??
+
 # Todo
 
 ## text drawing

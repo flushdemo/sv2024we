@@ -1,16 +1,7 @@
 #include "common.h"
+#include "printer.h"
 
 // Prints (and erase) characters in the text buffer
-
-#define DISPLAY_TIME 64
-
-static char *talking[] = {
-  " HOWDY FOLKS\n\nWE ARE BACK @\n\nSILLY VENTURE",
-  " WE WISH YOU\n\n ALL A MERRY\n\n  CHRISTMAS",
-  "ALSO YOU ARE\n\n INVITED TO\n\nSHADOW PARTY",
-  " GFX EXOCET\n\n MSX DMA-SC\n\nCDX FLEW/MARA",
-  ""
-};
 
 static void clear_text_buffer(char* buffer) {
   while (*buffer != '\0') {
@@ -28,11 +19,15 @@ static void optimise_text_buffer(char* buffer) {
 }
 
 static void next_step(char* buffer) {
-  static unsigned short s_cnt = 0; // String counter into the talking table
+  static unsigned short s_cnt = 0; // String counter into the printer_talk table
   static unsigned short c_cnt = 0; // Character counter into current string
   static unsigned short state = 0;
-  char* cur_str = talking[s_cnt];
+  static short display_time = -1;
+  char* cur_str = printer_talk[s_cnt];
 
+  if (display_time == -1) { // Initialization
+    display_time = printer_timing[s_cnt];
+  }
   switch (state) {
   case 0: {
     if (cur_str[c_cnt] == '\0') {
@@ -50,7 +45,7 @@ static void next_step(char* buffer) {
     break;
   }
   case 1: {
-    if (c_cnt < DISPLAY_TIME) {
+    if (c_cnt < display_time) {
       c_cnt++;
     }
     else {
@@ -81,9 +76,10 @@ static void next_step(char* buffer) {
     else {
 #endif
       clear_text_buffer(buffer);
-      s_cnt = talking[s_cnt+1][0] == '\0' ? 0 : s_cnt+1; // loop or not
+      s_cnt = printer_talk[s_cnt+1][0] == '\0' ? 0 : s_cnt+1; // loop or not
       c_cnt = 0;
       state = 0;
+      display_time = printer_timing[s_cnt];
 #ifdef USE_DOUBLE_BUFFER
     }
 #endif
@@ -94,7 +90,8 @@ static void next_step(char* buffer) {
 
 void update_printer(char* buffer, unsigned short clk) {
   static old_clk;
-  clk &= 0x04; // Trigerring on bit 8 change
+  clk &= 0x04; // Trigerring on bit 3 change
+  // Every 4 clocks i.e 12.5 times per second.
   if (clk != old_clk) {
     next_step(buffer);
     old_clk = clk;
