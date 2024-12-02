@@ -10,6 +10,10 @@ origine x,y (0, 21), largeur,hauteur (96, 160)
 
 # Todo
 
+## text drawing
+
+- Update drawing function to remove flickering
+
 ## Snowflakes drawings
 
 - use 4 different sprites

@@ -5,11 +5,9 @@
 
         section data
 
-_asset_palette  = * + 2
-_asset_fond     = * + 34
-_asset_fonte    = * + 32034 + 34
-_asset_musique  = * + 2*32034
+_asset_palette  = *
+_asset_fond     = * + 32
+_asset_fonte    = * + 32 + 32000
+_asset_musique  = * + 32 + 32000 + 7680
 
-        incbin "Assets/fond.pi1"
-        incbin "Assets/fonte.pi1"
-        incbin "Assets/FXMS2401.SND"
+        incbin "compact_assets.bin"
