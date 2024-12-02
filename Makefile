@@ -17,7 +17,7 @@ compact_assets.bin:
 assets.o: assets.s compact_assets.bin
 
 %.o: %.s
-	vasmm68k_mot -spaces -Faout -o $@ $<
+	vasmm68k_mot -quiet -spaces -Faout -o $@ $<
 
 %.o: %.c
 	vc +tos -c $(CFLAGS) -o $@ $<
