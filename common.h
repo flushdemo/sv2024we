@@ -33,4 +33,10 @@ extern char text_buffer[];
 extern unsigned short char_block[];
 extern unsigned short char_top_y[];
 
+// Assets
+extern unsigned short asset_palette[];
+extern unsigned short asset_fond[];
+extern unsigned short asset_fonte[];
+extern unsigned short asset_musique[];
+
 #endif

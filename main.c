@@ -43,15 +43,10 @@ struct degas_font {
 
 long (*soundtrack_vbl) (); // Soundtrack VBL function
 
-// Main data areas
-static struct degas_pic background;
-static struct degas_font font;
-static char music_buffer[MUSIC_BUFFER_SIZE];
-
 // Needed global for now
 char text_buffer[TEXT_BUFFER_SIZE];
 
-// Video ram buffer for double buffering
+// Video buffers
 static unsigned short backsnow_buffer[SCREEN_SIZE];
 #ifdef USE_DOUBLE_BUFFER
 static unsigned short video_buffer[SCREEN_SIZE + 128]; // 256 bytes alignment
@@ -60,29 +55,6 @@ static unsigned short video_buffer[SCREEN_SIZE + 128]; // 256 bytes alignment
 // Returns the frames count - Needs to be executed by supervisor
 static long sup_get_clock(void) { return *((long *)REG_FRCLOCK); }
 static long get_clock(void) { return Supexec(sup_get_clock); }
-
-static size_t load_file(char* target, char* filename, size_t length) {
-  FILE* fd = fopen(filename, "rb");
-  size_t cnt = fread(target, 1, length, fd);
-  fclose(fd);
-  return cnt;
-}
-
-static void load_picture_or_quit(struct degas_pic *target, char* filename) {
-  if ( load_file((char*)target, filename, DEGAS_FILE_SIZE) != DEGAS_FILE_SIZE ) {
-    printf("Error while loading picture \"%s\"\n", filename);
-    Cnecin();
-    exit(1);
-  }
-}
-
-static void load_font_or_quit(struct degas_font *target, char* filename) {
-  if ( load_file((char*)target, filename, FONT_FILE_SIZE) != FONT_FILE_SIZE ) {
-    printf("Error while loading font \"%s\"\n", filename);
-    Cnecin();
-    exit(1);
-  }
-}
 
 static void update_sprite_proxy(unsigned short *video_ptr,
                                 unsigned short *background_ptr,
@@ -124,7 +96,7 @@ static void main_loop(unsigned short *video_ptr,
 
     update_snow(video_ptr, backsnow_ptr, background_ptr, clk);
     update_printer(text_buffer, clk);
-    update_text(video_ptr, backsnow_ptr, font.picture, text_buffer, clk);
+    update_text(video_ptr, backsnow_ptr, asset_fonte, text_buffer, clk);
     update_sprite_proxy(video_ptr, backsnow_ptr, clk);
 
     #ifdef SHOW_FPS
@@ -148,37 +120,28 @@ int main() {
 #endif
 
   // Set soundtrack pointers
-  long* sndh_ptr = (long*) music_buffer;
+  long* sndh_ptr = (long*) asset_musique;
   long (*soundtrack_init) () = (long(*)()) &(sndh_ptr[0]);
   long (*soundtrack_deinit) () = (long(*)()) &(sndh_ptr[1]);
   soundtrack_vbl = (long(*)()) &(sndh_ptr[2]);
 
-
-  load_picture_or_quit(&background, "ASSETS/FOND.PI1");
-  load_font_or_quit(&font, "ASSETS/FONTE.PI1");
-
-  load_file(music_buffer, "ASSETS/FXMS2401.SND", MUSIC_BUFFER_SIZE);
-
   Supexec((void *)disable_conterm);
-
   Supexec(soundtrack_init);
   Supexec(set_music_player_vbl);
-
   hide_mouse();
 
-  Setpalette((void*)&(background.palette));
-  display_picture(video_ptr, background.picture);
+  Setpalette((void*)asset_palette);
+  display_picture(video_ptr, asset_fond);
+  display_picture(backsnow_buffer, asset_fond);
 #ifdef USE_DOUBLE_BUFFER
-  display_picture(vback_ptr, background.picture);
+  display_picture(vback_ptr, asset_fond);
 #endif
-  display_picture(backsnow_buffer, background.picture);
 
-  init_font_mask(font.picture);
+  init_font_mask(asset_fonte);
   init_snow();
   init_sprite();
-  //init_sprite(); // <= FIXME: bug probably odd address.
   main_loop(video_ptr, vback_ptr, backsnow_buffer,
-            background.picture, font.picture, text_buffer);
+            asset_fond, asset_fonte, text_buffer);
 
   Supexec(restore_vbl);
   Supexec(soundtrack_deinit);
