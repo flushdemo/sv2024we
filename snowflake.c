@@ -183,7 +183,7 @@ short flake_in_gnome(struct snow_flake *flake) {
   unsigned short fl_y = flake->y_pos;
   if ( fl_blk < GNOME_MAX_BLOCK &&
        fl_y > GNOME_MIN_Y &&
-       fl_y < GNOME_MAX_Y ) {
+       fl_y < (GNOME_MAX_Y - SNOW_FLAKE_HEIGHT) {
     return 1;
   }
   return 0;
