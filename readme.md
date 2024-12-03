@@ -52,6 +52,7 @@ v2.9 : 45.71 fps [75.8%] (Assembly version of  `display_flake_sprite(_opt)`)
 v2.12: 37.20 fps [-18%]  (Zero flickering mechanism)
 v2.13: 33.33 fps [-10%]  (Random flakes)
 v2.13: 36.36 fps [9%]    (Flakes everywhere, only background mask required)
+v2.14: 40 fps    [10%]   (Gnome cropped to 6 blocks)
 
 # Memory usage
 
