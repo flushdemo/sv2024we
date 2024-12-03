@@ -4,7 +4,7 @@
 // Feature flags
 #define FLICKER_REDUCTION 1
 //#define USE_DOUBLE_BUFFER 1
-#define NO_SNOW_ON_GNOME 1
+//#define NO_SNOW_ON_GNOME 1
 #define GNOME_SMART_DRAWING 1
 #define SHOW_FPS 1
 
@@ -33,6 +33,11 @@
 #define TEXT_STARTING_BLOCK 7
 #define TEXT_MIN_Y (TEXT_Y - 4) // Take into account sine offset
 #define TEXT_MAX_Y (TEXT_Y + TEXT_HEIGHT + CHAR_HEADER_HEIGHT + CHAR_FOOTER_HEIGHT + 4)
+
+// Gnome constants
+#define GNOME_MAX_BLOCK 6 // Excluded
+#define GNOME_MIN_Y 21
+#define GNOME_MAX_Y (160 + GNOME_MIN_Y)
 
 extern char text_buffer[];
 extern unsigned short char_block[];

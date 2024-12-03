@@ -21,21 +21,13 @@ _display_flake_sprite_opt:
         move.l  (\1, a2), d1    ; bg
 
         move.l  d4, d0          ; bm
-        or.l    d3, d0          ; fm | bm
-        and.l   d1, d0          ; bg & (bm | fm)
-        or.l    d2, d0          ; sp | (bg & (bm | fm))
+        and.l   d1, d0          ; bg & bm
+        or.l    d2, d0          ; sp | (bg & bm)
         move.l  d0, (\1, a1)    ; -> backsnow_ptr[j]
 
         ;; Drawing foreground or not ?
         tst.w   d6
         beq     \@_end_inner_loop
-
-        ;; reusing d1
-        and.l   d4, d1          ; bg & bm
-        or.l    d2, d1          ; sp | (bg & bm)
-        move.l  (\1, a0), d0    ; video_ptr[j]
-        and.l   d3, d0          ; video_ptr[j] & fm
-        or.l    d1, d0          ; (sp | (bg & bm)) | (video_ptr[j] & fm)
         move.l  d0, (\1, a0)    ; -> video_ptr[j]
 \@_end_inner_loop:
         ENDM

@@ -8,21 +8,10 @@ Pour lire les image .pi1, utiliser grafx2 sous Linux.
 
 origine x,y (0, 21), largeur,hauteur (96, 160)
 
-## Groupes a greetz inconnus
-
-asmtariste ??
-meuh ??
-make runm ??
-
 # Todo
-
-## text drawing
-
-- Update drawing function to remove flickering
 
 ## Snowflakes drawings
 
-- use 4 different sprites
 - clean display_snow_flakes arguments (useless sprite mask)
 - factorize some flakes masks
 - change subq1 + bge into appropriate
@@ -30,7 +19,7 @@ make runm ??
 
 ## gnome
 
-- 1 block xored, 4 blocks precalc, 1 block xored
+- 1 block xored, 4 blocks precalc, 1 block xored ?
 - performance tuning
 
 
@@ -61,6 +50,8 @@ v2.7 : 20 fps    [-45%]  (Fastest snow flakes + DMA-SC music)
 v2.8 : 26 fps    [30%]   (Started optimizing display_flake_sprite)
 v2.9 : 45.71 fps [75.8%] (Assembly version of  `display_flake_sprite(_opt)`)
 v2.12: 37.20 fps [-18%]  (Zero flickering mechanism)
+v2.13: 33.33 fps [-10%]  (Random flakes)
+v2.13: 36.36 fps [9%]    (Flakes everywhere, only background mask required)
 
 # Memory usage
 

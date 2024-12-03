@@ -118,8 +118,7 @@ void compute_flake_variants(void) {
         for (unsigned short b=0; b<BIT_PLANES; b++) {
           flake_pic_variants[a][v][h*BIT_PLANES+b] = 0;
         }
-        bg_mask_variants[a][v][h] = base_mask[v];
-        fg_mask_variants[a][v][h] = ~base_mask[v];
+        bg_mask_variants[a][v][h] = 0xffffffff;
       }
       for (unsigned short h=0; h<FLAKE_ASSET_HEIGHT; h++) {
         unsigned short sfh = SNOW_FLAKE_HEADER + h;
@@ -128,9 +127,8 @@ void compute_flake_variants(void) {
             asset_flocons[h*FLAKE_ASSET_LINE_WIDTH + a*BIT_PLANES + b] <<
             (v * (8 / (SNOW_FLAKE_VARIANTS-1)));
         }
-        unsigned long sprite_mask = build_sprite_mask( &flake_pic_variants[a][v][sfh*BIT_PLANES] );
-        bg_mask_variants[a][v][sfh] = ~sprite_mask & base_mask[v];
-        fg_mask_variants[a][v][sfh] = ~base_mask[v];
+        bg_mask_variants[a][v][sfh] =
+          ~build_sprite_mask(&flake_pic_variants[a][v][sfh*BIT_PLANES] );
       }
     }
   }
@@ -160,7 +158,7 @@ void update_snow_flake(struct snow_flake *flake, unsigned short delta) {
   }
 }
 
-int flake_in_text(struct snow_flake *flake) {
+short flake_in_text(struct snow_flake *flake) {
   unsigned short fl_blk = flake->x_block;
   unsigned short fl_y = flake->y_pos;
   if ( (flake->x_block >= TEXT_STARTING_BLOCK) &&
@@ -178,6 +176,17 @@ int flake_in_text(struct snow_flake *flake) {
     }
   }
   return 0; // flake not in text
+}
+
+short flake_in_gnome(struct snow_flake *flake) {
+  unsigned short fl_blk = flake->x_block;
+  unsigned short fl_y = flake->y_pos;
+  if ( fl_blk < GNOME_MAX_BLOCK &&
+       fl_y > GNOME_MIN_Y &&
+       fl_y < GNOME_MAX_Y ) {
+    return 1;
+  }
+  return 0;
 }
 
 void clear_flake_sprite(unsigned short* video_ptr,
@@ -216,7 +225,7 @@ void display_snow_flake(unsigned short* video_ptr,
       unsigned short update_video_ram = 1; // By default we update the vide RAM
 
 #ifdef FLICKER_REDUCTION
-      if ( flake_in_text(flake) ) { // Are we in behind a character ?
+      if ( flake_in_text(flake) || flake_in_gnome(flake) ) { // Are we in behind a sprite ?
         update_video_ram = 0; // Don't update video RAM
       }
 #endif
