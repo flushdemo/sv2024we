@@ -3,8 +3,8 @@
 #include "snowflake.h"
 
 #define FLAKE_SINE_MASK 0x1f
-#define FLAKE_COUNT 4
-#define FLAKE_ASSET_LINE_WIDTH (BIT_PLANES * FLAKE_COUNT)
+#define FLAKE_ASSET_COUNT 4
+#define FLAKE_ASSET_LINE_WIDTH (BIT_PLANES * FLAKE_ASSET_COUNT)
 #define FLAKE_ASSET_HEIGHT 8
 #define SNOW_FLAKE_HEADER (SNOW_FLAKE_HEIGHT - FLAKE_ASSET_HEIGHT)
 
@@ -39,59 +39,16 @@ static unsigned long base_mask[] = {
   0xff80ff80
 };
 
-// 8 lines
-// 4 bit planes
-// 1 word per bit plane
-// 8 bits LSB used
-static unsigned short snow_flake_pic[] = {
-  0x0000, 0x0000, 0x0000, 0x0000,
-  0x0000, 0x0000, 0x0000, 0x0000,
-  0x0000, 0x0000, 0x001c, 0x001c,
-  0x0000, 0x0000, 0x003e, 0x003e,
-  0x0000, 0x0000, 0x003e, 0x003e,
-  0x0000, 0x0000, 0x003e, 0x003e,
-  0x0000, 0x0000, 0x001c, 0x001c,
-};
-
-static unsigned short snow_flake_mask[] = {
-  0x0000,
-  0x0000,
-  0x001c,
-  0x003e,
-  0x003e,
-  0x003e,
-  0x001c,
-};
-
-static unsigned short background_mask[] = {
-  0x003e,
-  0x003e,
-  0x0063,
-  0x0041,
-  0x0041,
-  0x0041,
-  0x0022,
-};
-
-static unsigned short foreground_mask[] = {
-  0xffc1,
-  0xffc1,
-  0xff80,
-  0xff80,
-  0xff80,
-  0xff80,
-  0xffc1,
-};
-
 // Flakes variants storage
 static unsigned short flake_pic_variants
-[SNOW_FLAKE_VARIANTS][BIT_PLANES * SNOW_FLAKE_HEIGHT];
+[FLAKE_ASSET_COUNT][SNOW_FLAKE_VARIANTS][BIT_PLANES * SNOW_FLAKE_HEIGHT];
+// <TODO> Revemo sf_mask_variants
 static unsigned long sf_mask_variants
-[SNOW_FLAKE_VARIANTS][SNOW_FLAKE_HEIGHT];
+[FLAKE_ASSET_COUNT][SNOW_FLAKE_VARIANTS][SNOW_FLAKE_HEIGHT];
 static unsigned long bg_mask_variants
-[SNOW_FLAKE_VARIANTS][SNOW_FLAKE_HEIGHT];
+[FLAKE_ASSET_COUNT][SNOW_FLAKE_VARIANTS][SNOW_FLAKE_HEIGHT];
 static unsigned long fg_mask_variants
-[SNOW_FLAKE_VARIANTS][SNOW_FLAKE_HEIGHT];
+[FLAKE_ASSET_COUNT][SNOW_FLAKE_VARIANTS][SNOW_FLAKE_HEIGHT];
 
 struct snow_flake snow[MAX_SNOW_FLAKES];
 static unsigned short snow_count;
@@ -153,24 +110,26 @@ unsigned long build_sprite_mask(unsigned short* sprite) {
 
 void compute_flake_variants(void) {
   unsigned short step = 8 / (SNOW_FLAKE_VARIANTS - 1);
-  for (unsigned short v=0; v<SNOW_FLAKE_VARIANTS; v++) {
-    for (unsigned short h=0; h<SNOW_FLAKE_HEADER; h++) {
-      for (unsigned short b=0; b<BIT_PLANES; b++) {
-        flake_pic_variants[v][h*BIT_PLANES+b] = 0;
+  for (unsigned short a=0; a<FLAKE_ASSET_COUNT; a++) {
+    for (unsigned short v=0; v<SNOW_FLAKE_VARIANTS; v++) {
+      for (unsigned short h=0; h<SNOW_FLAKE_HEADER; h++) {
+        for (unsigned short b=0; b<BIT_PLANES; b++) {
+          flake_pic_variants[a][v][h*BIT_PLANES+b] = 0;
+        }
+        bg_mask_variants[a][v][h] = base_mask[v];
+        fg_mask_variants[a][v][h] = ~base_mask[v];
       }
-      bg_mask_variants[v][h] = base_mask[v];
-      fg_mask_variants[v][h] = ~base_mask[v];
-    }
-    for (unsigned short h=0; h<FLAKE_ASSET_HEIGHT; h++) {
-      unsigned short sfh = SNOW_FLAKE_HEADER + h;
-      for (unsigned short b=0; b<BIT_PLANES; b++) { // Build flake_pic_variants
-        flake_pic_variants[v][sfh*BIT_PLANES+b] =
-          asset_flocons[h*FLAKE_ASSET_LINE_WIDTH+b] <<
-          (v * (8 / (SNOW_FLAKE_VARIANTS-1)));
+      for (unsigned short h=0; h<FLAKE_ASSET_HEIGHT; h++) {
+        unsigned short sfh = SNOW_FLAKE_HEADER + h;
+        for (unsigned short b=0; b<BIT_PLANES; b++) { // Build flake_pic_variants
+          flake_pic_variants[a][v][sfh*BIT_PLANES+b] =
+            asset_flocons[h*FLAKE_ASSET_LINE_WIDTH + a*BIT_PLANES + b] <<
+            (v * (8 / (SNOW_FLAKE_VARIANTS-1)));
+        }
+        unsigned long sprite_mask = build_sprite_mask( &flake_pic_variants[a][v][sfh*BIT_PLANES] );
+        bg_mask_variants[a][v][sfh] = ~sprite_mask & base_mask[v];
+        fg_mask_variants[a][v][sfh] = ~base_mask[v];
       }
-      unsigned long sprite_mask = build_sprite_mask( &flake_pic_variants[v][sfh*BIT_PLANES] );
-      bg_mask_variants[v][sfh] = ~sprite_mask & base_mask[v];
-      fg_mask_variants[v][sfh] = ~base_mask[v];
     }
   }
 }
@@ -263,10 +222,10 @@ void display_snow_flake(unsigned short* video_ptr,
       display_flake_sprite_opt(video_ptr,
                                backsnow_ptr,
                                background_ptr,
-                               flake_pic_variants[var],
-                               sf_mask_variants[var],
-                               bg_mask_variants[var],
-                               fg_mask_variants[var],
+                               flake_pic_variants[3][var],
+                               sf_mask_variants[3][var],
+                               bg_mask_variants[3][var],
+                               fg_mask_variants[3][var],
                                update_video_ram);
 
       flake->old_x_pos = flake->x_pos;

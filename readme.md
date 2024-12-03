@@ -23,6 +23,8 @@ make runm ??
 ## Snowflakes drawings
 
 - use 4 different sprites
+- clean display_snow_flakes arguments (useless sprite mask)
+- factorize some flakes masks
 - change subq1 + bge into appropriate
 - critical code in assembly ?
 
