@@ -79,14 +79,38 @@ static unsigned long fg_mask_variants
 struct snow_flake snow[MAX_SNOW_FLAKES];
 static unsigned short snow_count;
 
+unsigned short random_block() {
+  unsigned short block;
+#ifdef NO_SNOW_ON_GNOME
+  // Avoid columns 1-4, center of gnome - too much clipping
+  // flakes in columns 0, 5-19.
+  block = ((Random() % 16) + 5) % SNOW_MAX_X_BLOCK;
+#else
+  // flakes everywhere
+  block = Random() % SNOW_MAX_X_BLOCK;
+#endif
+  return block;
+}
+
+unsigned short unused_random_block() {
+  unsigned short block;
+  unsigned short used = 1;
+  while (used) {
+    block = random_block();
+    used = 0;
+    for (unsigned int i=0; i<snow_count; i++) {
+      if (snow[i].x_block == block) {
+        used = 1;
+        break;
+      }
+    }
+  }
+  return block;
+}
+
 void reset_snow_flake(struct snow_flake *flake) {
   flake->x_pos = Random() % SNOW_FLAKE_VARIANTS;
-#ifdef NO_SNOW_ON_GNOME
-  flake->x_block = ((Random() % 16) + 5) % SNOW_MAX_X_BLOCK; // flakes in columns 0, 5 -- 19.
-#else
-  flake->x_block = Random() % SNOW_MAX_X_BLOCK; // flakes everywhere
-#endif
-  // Avoid columns 2, 3, center of gnome - too much clipping
+  flake->x_block = unused_random_block();
   flake->x_shift = Random() % 8;
   flake->x_vel = (Random() % (MAX_SNOW_X_VELOCITY-MIN_SNOW_X_VELOCITY)) + MIN_SNOW_X_VELOCITY;
   flake->y_vel = (Random() % (MAX_SNOW_Y_VELOCITY-MIN_SNOW_Y_VELOCITY)) + MIN_SNOW_Y_VELOCITY;

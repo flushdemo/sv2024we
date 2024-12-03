@@ -94,9 +94,9 @@ static void main_loop(unsigned short *video_ptr,
     video_ptr = tmp_ptr;
 #endif
 
-    update_snow(video_ptr, backsnow_ptr, background_ptr, clk);
     update_printer(text_buffer, clk);
     update_text(video_ptr, backsnow_ptr, asset_fonte, text_buffer, clk);
+    update_snow(video_ptr, backsnow_ptr, background_ptr, clk);
     update_sprite_proxy(video_ptr, backsnow_ptr, clk);
 
     #ifdef SHOW_FPS
