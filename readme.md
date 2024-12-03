@@ -22,12 +22,8 @@ make runm ??
 
 ## Snowflakes drawings
 
-- improve flakes updates (change +1 loop into +n)
-- simplify flakes masks
-- change subq1 + bge into appropriate
-
 - use 4 different sprites
-- use only required bitplanes ?
+- change subq1 + bge into appropriate
 - critical code in assembly ?
 
 ## gnome

@@ -3,6 +3,10 @@
 #include "snowflake.h"
 
 #define FLAKE_SINE_MASK 0x1f
+#define FLAKE_COUNT 4
+#define FLAKE_ASSET_LINE_WIDTH (BIT_PLANES * FLAKE_COUNT)
+#define FLAKE_ASSET_HEIGHT 8
+#define SNOW_FLAKE_HEADER (SNOW_FLAKE_HEIGHT - FLAKE_ASSET_HEIGHT)
 
 struct snow_flake {
   unsigned short x_block; // in 0 - 19
@@ -20,6 +24,19 @@ struct snow_flake {
 // [round(4*math.sin(x/32 * 2*math.pi))+4 for x in range(32)]
 static unsigned short flake_sine[] = {
 4, 5, 6, 6, 7, 7, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 2, 1, 1, 0, 0, 0, 0, 0, 1, 1, 2, 2, 3
+};
+
+// base masks for snow flakes
+static unsigned long base_mask[] = {
+  0x01ff01ff,
+  0x03ff03ff,
+  0x07fe07fe,
+  0x0ffc0ffc,
+  0x1ff81ff8,
+  0x3ff03ff0,
+  0x7fe07fe0,
+  0xffc0ffc0,
+  0xff80ff80
 };
 
 // 8 lines
@@ -126,20 +143,34 @@ void init_snow_flake(struct snow_flake *flake) {
   flake->y_pos = Random() % MAX_SNOW_Y;
 }
 
+unsigned long build_sprite_mask(unsigned short* sprite) {
+  unsigned short mask = 0;
+  for (unsigned short i=0; i<BIT_PLANES; i++) {
+    mask |= *(sprite+i);
+  }
+  return mask<<16 | mask;
+}
+
 void compute_flake_variants(void) {
   unsigned short step = 8 / (SNOW_FLAKE_VARIANTS - 1);
   for (unsigned short v=0; v<SNOW_FLAKE_VARIANTS; v++) {
-    for (unsigned short h=0; h<SNOW_FLAKE_HEIGHT; h++) {
-      sf_mask_variants[v][h] = ~(snow_flake_mask[h] << (v * step)); // precompute not
-      sf_mask_variants[v][h] = (sf_mask_variants[v][h] << 16) | (sf_mask_variants[v][h] & 0xffff);
-      bg_mask_variants[v][h] = background_mask[h] << (v * step);
-      bg_mask_variants[v][h] = (bg_mask_variants[v][h] << 16) | (bg_mask_variants[v][h] & 0xffff);
-      fg_mask_variants[v][h] = (foreground_mask[h] << (v * step)) | ((1 << (v * step)) - 1); // fill the right with ones
-      fg_mask_variants[v][h] = (fg_mask_variants[v][h] << 16) | (fg_mask_variants[v][h] & 0xffff);
-
+    for (unsigned short h=0; h<SNOW_FLAKE_HEADER; h++) {
       for (unsigned short b=0; b<BIT_PLANES; b++) {
-        flake_pic_variants[v][h*BIT_PLANES+b] = snow_flake_pic[h*BIT_PLANES+b] << (v * (8 / (SNOW_FLAKE_VARIANTS-1)));
+        flake_pic_variants[v][h*BIT_PLANES+b] = 0;
       }
+      bg_mask_variants[v][h] = base_mask[v];
+      fg_mask_variants[v][h] = ~base_mask[v];
+    }
+    for (unsigned short h=0; h<FLAKE_ASSET_HEIGHT; h++) {
+      unsigned short sfh = SNOW_FLAKE_HEADER + h;
+      for (unsigned short b=0; b<BIT_PLANES; b++) { // Build flake_pic_variants
+        flake_pic_variants[v][sfh*BIT_PLANES+b] =
+          asset_flocons[h*FLAKE_ASSET_LINE_WIDTH+b] <<
+          (v * (8 / (SNOW_FLAKE_VARIANTS-1)));
+      }
+      unsigned long sprite_mask = build_sprite_mask( &flake_pic_variants[v][sfh*BIT_PLANES] );
+      bg_mask_variants[v][sfh] = ~sprite_mask & base_mask[v];
+      fg_mask_variants[v][sfh] = ~base_mask[v];
     }
   }
 }
@@ -172,7 +203,7 @@ int flake_in_text(struct snow_flake *flake) {
   unsigned short fl_blk = flake->x_block;
   unsigned short fl_y = flake->y_pos;
   if ( (flake->x_block >= TEXT_STARTING_BLOCK) &&
-       (flake->y_pos >= (TEXT_MIN_Y - FLAKE_HEIGHT)) &&
+       (flake->y_pos >= (TEXT_MIN_Y - SNOW_FLAKE_HEIGHT)) &&
        (flake->y_pos <= TEXT_MAX_Y) ){ // Are we in the text zone ?
     for (unsigned short i=0; text_buffer[i] != '\0'; i++) {
       char chr = text_buffer[i];

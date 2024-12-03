@@ -10,7 +10,7 @@
 
 // Snow flakes
 #define MAX_SNOW_FLAKES 10
-#define FLAKE_HEIGHT 6
+#define SNOW_FLAKE_HEIGHT 10
 
 // Screen constants
 #define SCREEN_LINES 200 // Number of lines on the screen
@@ -42,6 +42,7 @@ extern unsigned short char_top_y[];
 extern unsigned short asset_palette[];
 extern unsigned short asset_fond[];
 extern unsigned short asset_fonte[];
+extern unsigned short asset_flocons[];
 extern unsigned short asset_musique[];
 
 #endif

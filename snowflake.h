@@ -4,7 +4,6 @@
 #include "common.h"
 
 #define SNOW_FLAKE_VARIANTS 9
-#define SNOW_FLAKE_HEIGHT 7
 #define MAX_SNOW_Y (SCREEN_LINES - SNOW_FLAKE_HEIGHT)
 #define MIN_SNOW_Y_VELOCITY 2
 #define MAX_SNOW_Y_VELOCITY 5

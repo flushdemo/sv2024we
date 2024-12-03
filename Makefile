@@ -31,5 +31,5 @@ assets.o: assets.s compact_assets.bin
 clean:
 	rm -f *.prg *.tos *.o g[0-9]spr.bin compact_assets.bin printer_talk.c
 
-run: main.prg
-	hatari --fast-boot true main.prg
+run: main_raw.prg
+	hatari --fast-boot true main_raw.prg

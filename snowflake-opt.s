@@ -1,4 +1,4 @@
-ASM_SNOW_FLAKE_HEIGHT equ 7 ; To synchronize with snowflake.h value
+ASM_SNOW_FLAKE_HEIGHT equ 10 ; To synchronize with common.h SNOW_FLAKE_HEIGHT value
 
 	section	"CODE",code
 
@@ -20,9 +20,10 @@ _display_flake_sprite_opt:
         move.l  (\1, a3), d2    ; sp
         move.l  (\1, a2), d1    ; bg
 
-        move.l  d5, d0          ; sm
-        and.l   d1, d0          ; bg & sm
-        or.l    d2, d0          ; sp | (bg & sm)
+        move.l  d4, d0          ; bm
+        or.l    d3, d0          ; fm | bm
+        and.l   d1, d0          ; bg & (bm | fm)
+        or.l    d2, d0          ; sp | (bg & (bm | fm))
         move.l  d0, (\1, a1)    ; -> backsnow_ptr[j]
 
         ;; Drawing foreground or not ?
