@@ -1,6 +1,6 @@
 \50
 flush / meuh
-presents
+present
 atarimas 2024
 
 \50
@@ -31,7 +31,7 @@ france
 \50
 a few
 greetings
-fly to
+to
 
 \0
 asmtariste
