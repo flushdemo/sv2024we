@@ -22,8 +22,8 @@ make runm ??
 
 ## Snowflakes drawings
 
-- simplify flakes masks
 - improve flakes updates (change +1 loop into +n)
+- simplify flakes masks
 - change subq1 + bge into appropriate
 
 - use 4 different sprites
@@ -62,7 +62,7 @@ v2.5 : 36.36 fps [-63%]  (Unoptimised implementation of flicker reduction)
 v2.7 : 20 fps    [-45%]  (Fastest snow flakes + DMA-SC music)
 v2.8 : 26 fps    [30%]   (Started optimizing display_flake_sprite)
 v2.9 : 45.71 fps [75.8%] (Assembly version of  `display_flake_sprite(_opt)`)
-v2.11: 37.20 fps [-18%]  (Zero flickering mechanism)
+v2.12: 37.20 fps [-18%]  (Zero flickering mechanism)
 
 # Memory usage
 
