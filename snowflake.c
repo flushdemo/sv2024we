@@ -9,6 +9,7 @@
 #define SNOW_FLAKE_HEADER (SNOW_FLAKE_HEIGHT - FLAKE_ASSET_HEIGHT)
 
 struct snow_flake {
+  unsigned short type; // in 0-3
   unsigned short x_block; // in 0 - 19
   unsigned short x_shift; // left shift in the 16bits block in [0 - 8]
   unsigned short x_vel; // x velocity
@@ -83,6 +84,7 @@ unsigned short unused_random_block() {
 }
 
 void reset_snow_flake(struct snow_flake *flake) {
+  flake->type = Random() % FLAKE_ASSET_COUNT;
   flake->x_pos = Random() % SNOW_FLAKE_VARIANTS;
   flake->x_block = unused_random_block();
   flake->x_shift = Random() % 8;
@@ -222,10 +224,10 @@ void display_snow_flake(unsigned short* video_ptr,
       display_flake_sprite_opt(video_ptr,
                                backsnow_ptr,
                                background_ptr,
-                               flake_pic_variants[3][var],
-                               sf_mask_variants[3][var],
-                               bg_mask_variants[3][var],
-                               fg_mask_variants[3][var],
+                               flake_pic_variants[flake->type][var],
+                               sf_mask_variants[flake->type][var],
+                               bg_mask_variants[flake->type][var],
+                               fg_mask_variants[flake->type][var],
                                update_video_ram);
 
       flake->old_x_pos = flake->x_pos;
