@@ -2,7 +2,6 @@
 #define __SV2024_TEXT_H 1
 
 // Font constants
-#define FONT_HEIGHT 16
 #define FONT_CHARS_PER_LINE 20
 #define FONT_LINE (FONT_HEIGHT * LINE_WIDTH)
 #define FONT_SIZE (3 * FONT_LINE) // 3 characters lines (60 chars) in a file

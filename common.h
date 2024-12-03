@@ -22,9 +22,13 @@
 #define GNOME_WIDTH 7 // in 16 bits blocks
 
 // Text zone constants
+#define FONT_HEIGHT 16
+#define CHAR_HEADER_HEIGHT 8
+#define CHAR_FOOTER_HEIGHT 8
+
 #define TEXT_BUFFER_SIZE 64
 #define TEXT_X 160 - (13*4) // 13 characters - right aligned
-#define TEXT_Y (SCREEN_LINES - (16*5)) / 2 // 5 lines centered
+#define TEXT_Y ((SCREEN_LINES - (FONT_HEIGHT*5)) / 2 - CHAR_HEADER_HEIGHT)// 5 lines centered
 #define TEXT_STARTING_BLOCK 7
 #define TEXT_MIN_Y (TEXT_Y - 3) // Take into account sine offset
 #define TEXT_MAX_Y (TEXT_Y + (16*5) + 3)
