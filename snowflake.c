@@ -164,35 +164,6 @@ int flake_in_text(struct snow_flake *flake) {
   return 0; // flake not in text
 }
 
-void display_flake_sprite(unsigned short* video_ptr,
-                          unsigned short* backsnow_ptr,
-                          unsigned short* background_ptr,
-                          unsigned short* flake_pic,
-                          unsigned short* flake_mask,
-                          unsigned short* background_mask,
-                          unsigned short* foreground_mask,
-                          unsigned short foreground_flake) {
-  for (unsigned short i=0; i < SNOW_FLAKE_HEIGHT; i++) {
-    unsigned short sm = flake_mask[i];
-    unsigned short bm = background_mask[i];
-    unsigned short fm = foreground_mask[i];
-
-    for (unsigned short j=0; j < BIT_PLANES; j++) {
-      unsigned short sp = flake_pic[j];
-      unsigned short bg = background_ptr[j];
-      backsnow_ptr[j] = sp | (bg & sm);
-      if (foreground_flake) {
-        video_ptr[j] = sp | (bg & bm) | (video_ptr[j] & fm);
-      }
-    }
-
-    flake_pic += BIT_PLANES;
-    video_ptr += LINE_WIDTH;
-    backsnow_ptr += LINE_WIDTH;
-    background_ptr += LINE_WIDTH;
-  }
-}
-
 void clear_flake_sprite(unsigned short* video_ptr,
                         unsigned short* backsnow_ptr,
                         unsigned short* background_ptr) {

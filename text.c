@@ -33,28 +33,6 @@ unsigned short font_position(unsigned short chr) {
   return chr_i << 2;
 }
 
-// Function deprecated
-// Use display_character_opt instead - speed x2-3
-void display_character(unsigned short* video_ptr,
-                              unsigned short* background_ptr,
-                              unsigned short* font_base,
-                              unsigned short chr) {
-  unsigned short font_pos = font_position(chr);
-  unsigned short* font_ptr = font_base + font_pos;
-  unsigned short* mask_ptr = font_mask + font_pos;
-
-  for (short j=FONT_HEIGHT-1; j >= 0; j--) {
-    unsigned short mask = mask_ptr[0]; // same mask for the 4 bitplanes
-    for (short i=BIT_PLANES-1; i >= 0; i--) {
-      video_ptr[i] = (background_ptr[i] & (~mask)) | (font_ptr[i] & mask);
-    }
-    background_ptr += LINE_WIDTH;
-    video_ptr += LINE_WIDTH;
-    font_ptr += LINE_WIDTH;
-    mask_ptr += LINE_WIDTH;
-  }
-}
-
 void init_font_mask(unsigned short* font_base) {
   for (unsigned short i=0; i < SCREEN_SIZE / BIT_PLANES; i += BIT_PLANES) {
     unsigned short m = 0;
