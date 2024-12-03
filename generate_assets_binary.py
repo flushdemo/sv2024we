@@ -3,7 +3,7 @@
 ASSET_FOND    = "Assets/fond.pi1"
 ASSET_FONTE   = "Assets/fonte.pi1"
 ASSET_FLOCONS = "Assets/flocons.pi1"
-ASSET_MUSIQUE = "Assets/FXMS2401.SND"
+ASSET_MUSIQUE = "Assets/FXMS2402.SND"
 
 OUTPUT = "compact_assets.bin"
 
