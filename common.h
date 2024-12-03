@@ -6,7 +6,7 @@
 //#define USE_DOUBLE_BUFFER 1
 //#define NO_SNOW_ON_GNOME 1
 #define GNOME_SMART_DRAWING 1
-#define SHOW_FPS 1
+//#define SHOW_FPS 1
 
 // Snow flakes
 #define MAX_SNOW_FLAKES 10
