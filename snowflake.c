@@ -27,28 +27,10 @@ static unsigned short flake_sine[] = {
 4, 5, 6, 6, 7, 7, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 2, 1, 1, 0, 0, 0, 0, 0, 1, 1, 2, 2, 3
 };
 
-// base masks for snow flakes
-static unsigned long base_mask[] = {
-  0x01ff01ff,
-  0x03ff03ff,
-  0x07fe07fe,
-  0x0ffc0ffc,
-  0x1ff81ff8,
-  0x3ff03ff0,
-  0x7fe07fe0,
-  0xffc0ffc0,
-  0xff80ff80
-};
-
 // Flakes variants storage
 static unsigned short flake_pic_variants
 [FLAKE_ASSET_COUNT][SNOW_FLAKE_VARIANTS][BIT_PLANES * SNOW_FLAKE_HEIGHT];
-// <TODO> Revemo sf_mask_variants
-static unsigned long sf_mask_variants
-[FLAKE_ASSET_COUNT][SNOW_FLAKE_VARIANTS][SNOW_FLAKE_HEIGHT];
 static unsigned long bg_mask_variants
-[FLAKE_ASSET_COUNT][SNOW_FLAKE_VARIANTS][SNOW_FLAKE_HEIGHT];
-static unsigned long fg_mask_variants
 [FLAKE_ASSET_COUNT][SNOW_FLAKE_VARIANTS][SNOW_FLAKE_HEIGHT];
 
 struct snow_flake snow[MAX_SNOW_FLAKES];
@@ -183,7 +165,7 @@ short flake_in_gnome(struct snow_flake *flake) {
   unsigned short fl_y = flake->y_pos;
   if ( fl_blk < GNOME_MAX_BLOCK &&
        fl_y > GNOME_MIN_Y &&
-       fl_y < (GNOME_MAX_Y - SNOW_FLAKE_HEIGHT) {
+       fl_y < (GNOME_MAX_Y - SNOW_FLAKE_HEIGHT) ) {
     return 1;
   }
   return 0;
@@ -234,9 +216,7 @@ void display_snow_flake(unsigned short* video_ptr,
                                backsnow_ptr,
                                background_ptr,
                                flake_pic_variants[flake->type][var],
-                               sf_mask_variants[flake->type][var],
                                bg_mask_variants[flake->type][var],
-                               fg_mask_variants[flake->type][var],
                                update_video_ram);
 
       flake->old_x_pos = flake->x_pos;

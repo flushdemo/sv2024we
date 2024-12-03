@@ -10,16 +10,17 @@ origine x,y (0, 21), largeur,hauteur (96, 160)
 
 # Todo
 
+## Text
+
+- Star to start with first line letters
+
 ## Snowflakes drawings
 
-- clean display_snow_flakes arguments (useless sprite mask)
-- factorize some flakes masks
 - change subq1 + bge into appropriate
-- critical code in assembly ?
+- critical (test) code in assembly ?
 
 ## gnome
 
-- 1 block xored, 4 blocks precalc, 1 block xored ?
 - performance tuning
 
 
@@ -53,6 +54,7 @@ v2.12: 37.20 fps [-18%]  (Zero flickering mechanism)
 v2.13: 33.33 fps [-10%]  (Random flakes)
 v2.13: 36.36 fps [9%]    (Flakes everywhere, only background mask required)
 v2.14: 40 fps    [10%]   (Gnome cropped to 6 blocks)
+v2.16: 42.10 fps [5%]    (Optimisation of snowflake drawing)
 
 # Memory usage
 

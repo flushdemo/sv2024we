@@ -25,9 +25,7 @@ void display_flake_sprite_opt(unsigned short* video_ptr,
                               unsigned short* backsnow_ptr,
                               unsigned short* background_ptr,
                               unsigned short* flake_pic,
-                              unsigned long* flake_mask,
                               unsigned long* background_mask,
-                              unsigned long* foreground_mask,
                               unsigned short foreground_flake_flag);
 
 #endif

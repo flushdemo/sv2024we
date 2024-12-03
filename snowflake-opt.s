@@ -6,10 +6,8 @@ ASM_SNOW_FLAKE_HEIGHT equ 10 ; To synchronize with common.h SNOW_FLAKE_HEIGHT va
 	cnop	0,4
 _display_flake_sprite_opt:
 	movem.l	regsf_lst, -(a7)
-	move.l	(32 + regsf_cnt, a7), d6 ; foreground_flake_flag
-	move.l	(28 + regsf_cnt, a7), a6 ; foreground_mask
-	move.l	(24 + regsf_cnt, a7), a5 ; background_mask
-	move.l	(20 + regsf_cnt, a7), a4 ; flake_mask
+	move.l	(24 + regsf_cnt, a7), d6 ; foreground_flake_flag
+	move.l	(20 + regsf_cnt, a7), a5 ; background_mask
 	move.l	(16 + regsf_cnt, a7), a3 ; flake_pic
 	move.l	(12 + regsf_cnt, a7), a2 ; background_ptr
 	move.l	( 8 + regsf_cnt, a7), a1 ; backsnow_ptr
@@ -17,40 +15,35 @@ _display_flake_sprite_opt:
 
 ;;; Inner loop
         MACRO APPLY_FLAKE_MASK
-        move.l  (\1, a3), d2    ; sp
         move.l  (\1, a2), d1    ; bg
-
-        move.l  d4, d0          ; bm
-        and.l   d1, d0          ; bg & bm
-        or.l    d2, d0          ; sp | (bg & bm)
-        move.l  d0, (\1, a1)    ; -> backsnow_ptr[j]
+        and.l   d4, d1          ; bg & bm
+        or.l    (\1, a3), d1    ; sp | (bg & bm)
+        move.l  d1, (\1, a1)    ; -> backsnow_ptr[j]
 
         ;; Drawing foreground or not ?
         tst.w   d6
         beq     \@_end_inner_loop
-        move.l  d0, (\1, a0)    ; -> video_ptr[j]
+        move.l  d1, (\1, a0)    ; -> video_ptr[j]
 \@_end_inner_loop:
         ENDM
 ;;; Inner loop
 
 ;;; Outer loop
         REPT    ASM_SNOW_FLAKE_HEIGHT
-        move.l  (4*REPTN, a4), d5  ; sm
         move.l  (4*REPTN, a5), d4  ; bm
-        move.l  (4*REPTN, a6), d3  ; fm
 
         APPLY_FLAKE_MASK 0
         APPLY_FLAKE_MASK 4
 
         ;; Increase pointers
-	add.l	  #8, a3
 	add.l	#160, a0
 	add.l	#160, a1
 	add.l	#160, a2
+	add.l	  #8, a3
         ENDR
 ;;; Outer loop
 
-regsf_lst:      reg	a2/a3/a4/a5/a6/d2/d3/d4/d5/d6/d7
-	        movem.l	(a7)+,a2/a3/a4/a5/a6/d2/d3/d4/d5/d6/d7
-regsf_cnt       equ	44
+regsf_lst:      reg	a2/a3/a5/d2/d4/d6
+	        movem.l	(a7)+,a2/a3/a5/d2/d4/d6
+regsf_cnt       equ	(4*6)
 	        rts
