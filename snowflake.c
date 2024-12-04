@@ -144,6 +144,7 @@ short flake_in_text(struct snow_flake *flake) {
   unsigned short fl_blk = flake->x_block;
   unsigned short fl_y = flake->y_pos;
   if ( (flake->x_block >= TEXT_STARTING_BLOCK) &&
+       (flake->x_block <= TEXT_LAST_BLOCK) &&
        (flake->y_pos >= (TEXT_MIN_Y - SNOW_FLAKE_HEIGHT)) &&
        (flake->y_pos <= TEXT_MAX_Y) ){ // Are we in the text zone ?
     for (unsigned short i=0; text_buffer[i] != '\0'; i++) {

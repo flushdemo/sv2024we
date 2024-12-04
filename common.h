@@ -27,6 +27,7 @@
 #define TEXT_BUFFER_SIZE 64
 #define TEXT_Y ((SCREEN_LINES - TEXT_HEIGHT) / 2 - CHAR_HEADER_HEIGHT)// 5 lines centered
 #define TEXT_STARTING_BLOCK 6
+#define TEXT_LAST_BLOCK 18
 #define TEXT_MIN_Y (TEXT_Y - 4) // Take into account sine offset
 #define TEXT_MAX_Y (TEXT_Y + TEXT_HEIGHT + CHAR_HEADER_HEIGHT + CHAR_FOOTER_HEIGHT + 4)
 
