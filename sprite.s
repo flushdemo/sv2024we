@@ -5,6 +5,7 @@
 GNOME_OFFSET  = 21              ; lines
 GNOME_NBLINES = 160             ; lines
 GNOME_NBLOCKS = 6               ; 16bits blocks
+FOOTER_HEIGHT = 10
 
 _init_sprite:
     movem.l     d0-d7/a0-a6,-(a7)
@@ -80,16 +81,33 @@ gnome_show:
 	and.l		4(a5),d3   ; background bit plane 3 and 4 and mask
 	or.l        4(a0),d3   ; or sprite bit plane 3 and 4
     move.l		d3,4(a6)
-	
+
 	addq.l		#8,a0
     addq.l      #8,a6
     addq.l      #8,a5
     addq.l      #2,a4
 	ENDR
-	
+
 	add.l		#160-(GNOME_NBLOCKS*8),a5        ; next line
 	add.l		#160-(GNOME_NBLOCKS*8),a6        ; as well
 	dbf 		d2,.shw_gnome_msk_frame_0
+
+
+        move.l  #FOOTER_HEIGHT-1, d2
+.footer_loop
+        REPT GNOME_NBLOCKS
+        move.l  0(a5), d1
+        move.l  d1, 0(a6)
+        move.l  4(a5), d1
+        move.l  d1, 4(a6)
+        addq.l  #8, a5
+        addq.l  #8, a6
+        ENDR
+
+        add.l   #160-(GNOME_NBLOCKS*8), a5
+        add.l   #160-(GNOME_NBLOCKS*8), a6
+	dbf 	d2, .footer_loop
+
 
 	movem.l		(a7)+,d0-d7/a0-a6
 	rts
