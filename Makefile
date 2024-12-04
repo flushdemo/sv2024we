@@ -2,6 +2,11 @@ CFLAGS=-g
 
 all: binfile main.prg
 
+dist:	flush.zip
+	
+flush.zip: main.prg
+	zip -z9	$@ $< sv2024we.nfo file_id.diz  < file_id.diz
+
 binfile:
 	python3 create-img-bin-file.py 
 
@@ -29,7 +34,7 @@ assets.o: assets.s compact_assets.bin
 	vc +tos -S $(CFLAGS) -o $@ $<
 
 clean:
-	rm -f *.prg *.tos *.o g[0-9]spr.bin compact_assets.bin printer_talk.c
+	rm -f *.prg *.tos *.o g[0-9]spr.bin compact_assets.bin printer_talk.c *.zip
 
 run: main_raw.prg
 	hatari --fast-boot true main_raw.prg
