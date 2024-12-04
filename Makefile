@@ -2,10 +2,10 @@ CFLAGS=-g
 
 all: binfile main.prg
 
-dist:	flush.zip
-	
-flush.zip: main.prg
-	zip -z9	$@ $< sv2024we.nfo file_id.diz  < file_id.diz
+dist: flush.zip
+
+flush.zip: file_id.diz sv2024we.nfo main.prg
+	zip -z9	$@ $^ < $<
 
 binfile:
 	python3 create-img-bin-file.py 
