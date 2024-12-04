@@ -52,8 +52,8 @@ msx dma-sc
 
 \50
 code
-flewww +
-maracuja
+mara +
+flewww
 
 \50
 greetings
