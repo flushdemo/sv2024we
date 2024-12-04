@@ -1,8 +1,6 @@
 #ifndef __SV2024_COMMON_H
 #define __SV2024_COMMON_H 1
 
-#define PROD_VERSION "v2.24"
-
 // Feature flags
 #define FLICKER_REDUCTION 1
 //#define USE_DOUBLE_BUFFER 1
