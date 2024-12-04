@@ -151,7 +151,7 @@ short flake_in_text(struct snow_flake *flake) {
       char chr = text_buffer[i];
       if ((chr != '\n') && (chr != '#') && (chr != ' ')) {
         if ((fl_blk == char_block[i]) &&
-            (fl_y > char_top_y[i]) &&
+            (fl_y >= char_top_y[i]) &&
             (fl_y < (char_top_y[i] + CHAR_HEADER_HEIGHT + FONT_HEIGHT))) {
           return 1;
         }

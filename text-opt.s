@@ -1,5 +1,5 @@
-HEADER_HEIGHT = 8
-FOOTER_HEIGHT = 8
+HEADER_HEIGHT = 10      ; Synchronize with CHAR_HEADER_HEIGHT in common.h
+FOOTER_HEIGHT = 10      ; Synchronize with CHAR_FOOTER_HEIGHT in common.h
 
         xdef    _display_character_opt
 

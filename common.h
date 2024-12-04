@@ -23,8 +23,8 @@
 // Text zone constants
 #define FONT_HEIGHT 16
 #define TEXT_HEIGHT (FONT_HEIGHT * 5)
-#define CHAR_HEADER_HEIGHT 8
-#define CHAR_FOOTER_HEIGHT 8
+#define CHAR_HEADER_HEIGHT 10
+#define CHAR_FOOTER_HEIGHT 10
 
 #define TEXT_BUFFER_SIZE 64
 #define TEXT_Y ((SCREEN_LINES - TEXT_HEIGHT) / 2 - CHAR_HEADER_HEIGHT)// 5 lines centered
