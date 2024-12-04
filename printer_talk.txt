@@ -26,7 +26,7 @@ entirely
 human-made
 
 \50
-a 40k intro
+a 36kb intro
 running on
 atari 520 stf
 
