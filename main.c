@@ -43,6 +43,9 @@ struct degas_font {
 
 long (*soundtrack_vbl) (); // Soundtrack VBL function
 
+// Version number
+static char *prod_version = PROD_VERSION;
+
 // Needed global for now
 char text_buffer[TEXT_BUFFER_SIZE];
 
@@ -136,6 +139,8 @@ int main() {
   // Display background
   Setpalette((void*)asset_palette);
   display_picture(video_ptr, asset_fond);
+  Cconws("\x1bH");
+  Cconws(prod_version);
 
   // initialize stuff
   display_picture(backsnow_buffer, asset_fond);
@@ -146,6 +151,8 @@ int main() {
   init_font_mask(asset_fonte);
   init_snow();
   init_sprite();
+  // Cleanup background
+  display_picture(video_ptr, asset_fond);
 
   // Start music and initialize clock
   Supexec(soundtrack_init);

@@ -1,4 +1,4 @@
-CFLAGS=-g
+#CFLAGS=-g
 
 all: binfile gnoel.prg
 
