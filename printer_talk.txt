@@ -46,6 +46,16 @@ you to
 shadow party
 
 \50
+credits
+gfx exocet
+msx dma-sc
+
+\50
+code
+flewww +
+maracuja
+
+\50
 greetings
 to
 
