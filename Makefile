@@ -1,19 +1,19 @@
 CFLAGS=-g
 
-all: binfile main.prg
+all: binfile gnoel.prg
 
-dist: flush.zip
+dist: gnoel.zip
 
-flush.zip: file_id.diz sv2024we.nfo main.prg
+gnoel.zip: file_id.diz gnoel.nfo gnoel.prg
 	zip -z9	$@ $^ < $<
 
 binfile:
 	python3 create-img-bin-file.py 
 
-main.prg: main_raw.prg
+gnoel.prg: gnoel_raw.prg
 	upx --force-overwrite -o $@ $<
 
-main_raw.prg: main.o misc.o printer.o printer_talk.o sprite.o text.o text-opt.o vbl.o snowflake.o snowflake-opt.o assets.o
+gnoel_raw.prg: main.o misc.o printer.o printer_talk.o sprite.o text.o text-opt.o vbl.o snowflake.o snowflake-opt.o assets.o
 	vc +tos $(CFLAGS) -o $@ $^
 
 compact_assets.bin:
@@ -36,5 +36,5 @@ assets.o: assets.s compact_assets.bin
 clean:
 	rm -f *.prg *.tos *.o g[0-9]spr.bin compact_assets.bin printer_talk.c *.zip
 
-run: main_raw.prg
-	hatari --fast-boot true main_raw.prg
+run: gnoel_raw.prg
+	hatari --fast-boot true gnoel_raw.prg
