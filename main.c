@@ -52,9 +52,13 @@ static unsigned short backsnow_buffer[SCREEN_SIZE];
 static unsigned short video_buffer[SCREEN_SIZE + 128]; // 256 bytes alignment
 #endif
 
+// Clock reference
+static unsigned short clk_0 = 0;
+
 // Returns the frames count - Needs to be executed by supervisor
 static long sup_get_clock(void) { return *((long *)REG_FRCLOCK); }
-static long get_clock(void) { return Supexec(sup_get_clock); }
+static unsigned short get_clock(void) { return (Supexec(sup_get_clock) & 0xffff) - clk_0; }
+static void init_clock(void) { clk_0 = get_clock(); }
 
 static void update_sprite_proxy(unsigned short *video_ptr,
                                 unsigned short *background_ptr,
@@ -125,13 +129,15 @@ int main() {
   long (*soundtrack_deinit) () = (long(*)()) &(sndh_ptr[1]);
   soundtrack_vbl = (long(*)()) &(sndh_ptr[2]);
 
-  Supexec((void *)disable_conterm);
-  Supexec(soundtrack_init);
-  Supexec(set_music_player_vbl);
+  // Cleanup screen and disable key strokes
   hide_mouse();
+  Supexec((void *)disable_conterm);
 
+  // Display background
   Setpalette((void*)asset_palette);
   display_picture(video_ptr, asset_fond);
+
+  // initialize stuff
   display_picture(backsnow_buffer, asset_fond);
 #ifdef USE_DOUBLE_BUFFER
   display_picture(vback_ptr, asset_fond);
@@ -140,6 +146,13 @@ int main() {
   init_font_mask(asset_fonte);
   init_snow();
   init_sprite();
+
+  // Start music and initialize clock
+  Supexec(soundtrack_init);
+  Supexec(set_music_player_vbl);
+  init_clock();
+
+  // Then main loop
   main_loop(video_ptr, vback_ptr, backsnow_buffer,
             asset_fond, asset_fonte, text_buffer);
 
