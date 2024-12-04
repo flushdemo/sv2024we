@@ -21,7 +21,7 @@ gnoel_raw.prg: main.o misc.o printer.o printer_talk.o sprite.o text.o text-opt.o
 
 _sprite_binaries.bin:
 	python3 create-img-bin-file.py
-	touch _binfile
+	touch _sprite_binaries.bin
 
 compact_assets.bin:
 	python3 generate_assets_binary.py
