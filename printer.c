@@ -54,7 +54,7 @@ static void next_step(char* buffer) {
         c_cnt = skip_spaces(buffer, cur_str, c_cnt+1);
       }
       else {
-        buffer[c_cnt] = '&';
+        buffer[c_cnt] = '<';
         c_cnt++;
       }
     }
