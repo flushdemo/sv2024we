@@ -18,15 +18,25 @@ static void optimise_text_buffer(char* buffer) {
   }
 }
 
+unsigned short skip_spaces(char* buffer, char* cur_str, unsigned short c_cnt) {
+  while (cur_str[c_cnt] == ' ') {
+    buffer[c_cnt] = ' ';
+    c_cnt++;
+  }
+  return c_cnt;
+}
+
 static void next_step(char* buffer) {
   static unsigned short s_cnt = 0; // String counter into the printer_talk table
   static unsigned short c_cnt = 0; // Character counter into current string
-  static unsigned short state = 0;
+  static unsigned short state = 0; // initial state
   static short display_time = -1;
-  char* cur_str = printer_talk[s_cnt];
+  static char* cur_str;
 
   if (display_time == -1) { // Initialization
+    cur_str = printer_talk[s_cnt];
     display_time = printer_timing[s_cnt];
+    c_cnt = skip_spaces(buffer, cur_str, 0);
   }
   switch (state) {
   case 0: {
@@ -38,9 +48,15 @@ static void next_step(char* buffer) {
       state = 1;
     }
     else {
-      buffer[c_cnt] = cur_str[c_cnt] == '\n' ? '\n' : '&';
       if (c_cnt > 0) buffer[c_cnt-1] = cur_str[c_cnt-1];
-      c_cnt++;
+      if (cur_str[c_cnt] == '\n') {
+        buffer[c_cnt] = '\n';
+        c_cnt = skip_spaces(buffer, cur_str, c_cnt+1);
+      }
+      else {
+        buffer[c_cnt] = '&';
+        c_cnt++;
+      }
     }
     break;
   }
@@ -49,7 +65,7 @@ static void next_step(char* buffer) {
       c_cnt++;
     }
     else {
-      c_cnt = 0;
+      c_cnt = skip_spaces(buffer, cur_str, 0);
       state = 2;
     }
     break;
@@ -62,9 +78,15 @@ static void next_step(char* buffer) {
       state = 3;
     }
     else {
-      buffer[c_cnt] = cur_str[c_cnt] == '\n' ? '\n' : '&';
       if (c_cnt > 0) buffer[c_cnt-1] = cur_str[c_cnt-1] == '\n' ? '\n' : ' ';
-      c_cnt++;
+      if (cur_str[c_cnt] == '\n') {
+        buffer[c_cnt] = '\n';
+        c_cnt = skip_spaces(buffer, cur_str, c_cnt+1);
+      }
+      else {
+        buffer[c_cnt] = '&';
+        c_cnt++;
+      }
     }
     break;
   }
@@ -77,9 +99,10 @@ static void next_step(char* buffer) {
 #endif
       clear_text_buffer(buffer);
       s_cnt = printer_talk[s_cnt+1][0] == '\0' ? 0 : s_cnt+1; // loop or not
-      c_cnt = 0;
-      state = 0;
+      cur_str = printer_talk[s_cnt];
       display_time = printer_timing[s_cnt];
+      c_cnt = skip_spaces(buffer, cur_str, 0);;
+      state = 0;
 #ifdef USE_DOUBLE_BUFFER
     }
 #endif
