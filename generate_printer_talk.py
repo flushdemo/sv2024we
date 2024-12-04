@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+import subprocess
 
 LINES_PER_PAGE = 3
 CHARS_PER_LINE = 13
@@ -11,8 +12,11 @@ def build_phrase(phrase):
         s+= l
         res.append(s)
     return "\\n"*(3 - len(res)) + "\\n\\n".join(res)
-        
-def process_file(fname):
+
+def process_file(fname, git_tag):
+    """
+    The git tag will be automatically appended at the end of the talk.
+    """
     with open(fname) as fd:
         data = fd.read().strip().upper().split("\n")
 
@@ -30,13 +34,14 @@ def process_file(fname):
 
     if phrase: # Talk last phrases into account
         talk.append(phrase)
-            
+
     c_strings = [build_phrase(p) for p in talk]
     print(
-        "char *printer_talk[] = {\n" +
-        ",\n".join(['  "'+cs+'"' for cs in c_strings]) +
-        ",\n  \"\"" +
-        "\n};"
+         'char *printer_talk[] = {\n' +
+         ',\n'.join([f'  "{cs}"' for cs in c_strings]) +
+         ',\n  ""' +
+        f',\n  "version:{git_tag}"' +
+         '\n};'
     )
     print()
     print(
@@ -45,5 +50,10 @@ def process_file(fname):
         ", ".join(timing) +
         "\n};"
     )
-        
-process_file(sys.argv[1])
+
+def main():
+    git_tag = subprocess.check_output(['git', 'describe', '--tags'])
+    git_tag = git_tag.decode('utf-8').strip()
+    process_file(sys.argv[1], git_tag)
+
+main()

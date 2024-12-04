@@ -1,14 +1,17 @@
 #CFLAGS=-g
 
-all: binfile gnoel.prg
+# Rebuild printer_talk.c everytime to embed the version number in the binary automatically
+.PHONY: dist run printer_talk.c
+
+all: gnoel.prg
 
 dist: gnoel.zip
 
+run: gnoel_raw.prg
+	hatari --fast-boot true gnoel_raw.prg
+
 gnoel.zip: file_id.diz gnoel.nfo gnoel.prg
 	zip -z9	$@ $^ < $<
-
-binfile:
-	python3 create-img-bin-file.py 
 
 gnoel.prg: gnoel_raw.prg
 	upx --force-overwrite -o $@ $<
@@ -16,11 +19,17 @@ gnoel.prg: gnoel_raw.prg
 gnoel_raw.prg: main.o misc.o printer.o printer_talk.o sprite.o text.o text-opt.o vbl.o snowflake.o snowflake-opt.o assets.o
 	vc +tos $(CFLAGS) -o $@ $^
 
+_sprite_binaries.bin:
+	python3 create-img-bin-file.py
+	touch _binfile
+
 compact_assets.bin:
 	python3 generate_assets_binary.py
 
 printer_talk.c: printer_talk.txt
 	python3 generate_printer_talk.py $< > $@
+
+sprite.o: _sprite_binaries.bin
 
 assets.o: assets.s compact_assets.bin
 
@@ -34,7 +43,4 @@ assets.o: assets.s compact_assets.bin
 	vc +tos -S $(CFLAGS) -o $@ $<
 
 clean:
-	rm -f *.prg *.tos *.o g[0-9]spr.bin compact_assets.bin printer_talk.c *.zip
-
-run: gnoel_raw.prg
-	hatari --fast-boot true gnoel_raw.prg
+	rm -f *.prg *.tos *.o *.bin *.zip printer_talk.c
