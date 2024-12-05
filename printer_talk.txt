@@ -73,45 +73,42 @@ to greet
 \0
 !!M
 asmtariste
-booz design
+bomb
 
 \0
+booz design
 cookie crew
 dentifrice
-dfs
-
 
 \0
+dfs
 dune
 fuzion
-gen. project
-
 
 \0
+gen. project
 hmd
 mjj prod
-mystic bytes
-
 
 \0
+mystic bytes
 overlanders
 rbbs
-replicants
 
 \0
+replicants
 sector one
 smfx
-st knights
 
 \0
+st knights
 titan demo
+vital motion
+
+\0
 vretrocomputing
 up rough
-
-\0
-
 x-men
-
 
 \50
 and
