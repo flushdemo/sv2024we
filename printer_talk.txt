@@ -93,20 +93,20 @@ mjj prod
 \0
 mystic bytes
 overlanders
-rbbs
+popsy team
 
 \0
+rbbs
 replicants
 sector one
-smfx
 
 \0
+smfx
 st knights
 titan demo
-vital motion
 
 \0
-vretrocomputing
+vital motion
 up rough
 x-men
 
