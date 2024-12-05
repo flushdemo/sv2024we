@@ -14,7 +14,7 @@ gnoel.zip: file_id.diz gnoel.nfo gnoel.prg
 	zip -z9	$@ $^ < $<
 
 gnoel.prg: gnoel_raw.prg
-#	upx --force-overwrite -o $@ $<
+	upx --force-overwrite -o $@ $<
 
 gnoel_raw.prg: main.o misc.o printer.o printer_talk.o sprite.o text.o text-opt.o vbl.o snowflake.o snowflake-opt.o assets.o
 	vc +tos $(CFLAGS) -o $@ $^
