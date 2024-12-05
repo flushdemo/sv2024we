@@ -1,4 +1,5 @@
 #CFLAGS=-g
+UPX_FLAGS=--force-overwrite
 
 # Rebuild printer_talk.c everytime to embed the version number in the binary automatically
 .PHONY: dist run printer_talk.c
@@ -14,7 +15,7 @@ gnoel.zip: file_id.diz gnoel.nfo gnoel.prg
 	zip -z9	$@ $^ < $<
 
 gnoel.prg: gnoel_raw.prg
-	upx --force-overwrite -o $@ $<
+	upx $(UPX_FLAGS) -o $@ $<
 
 gnoel_raw.prg: main.o misc.o printer.o printer_talk.o sprite.o text.o text-opt.o vbl.o snowflake.o snowflake-opt.o assets.o
 	vc +tos $(CFLAGS) -o $@ $^
