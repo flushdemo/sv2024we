@@ -62,32 +62,10 @@ static long sup_get_clock(void) { return *((long *)REG_FRCLOCK); }
 static unsigned short get_clock(void) { return (Supexec(sup_get_clock) & 0xffff) - clk_0; }
 static void init_clock(void) { clk_0 = get_clock(); }
 
-static unsigned short *g_video_ptr;
-static unsigned short *g_background_ptr;
-static unsigned short g_clk;
-
-static void update_sprite_proxy(unsigned short *video_ptr,
-                                unsigned short *background_ptr,
-                                unsigned short clk) {
-  static unsigned short old_clk = 0;
-  clk = clk / GNOME_SPEED;
-#ifdef GNOME_SMART_DRAWING
-  if (clk != old_clk)
-#endif
-    update_sprite(video_ptr, background_ptr, clk);
-  old_clk = clk;
-}
-
-void interrupt_draw_gnome() {
-  //update_sprite_proxy(g_video_ptr, g_background_ptr, g_clk);
-  for(short i=0; i<16; i++) {
-    *(PALETTE_ADDR+i) = 0x700;
-  }
-  for (short i=0; i<10; i++);
-  for(short i=0; i<16; i++) {
-    *(PALETTE_ADDR+i) = asset_palette[i];
-  }
-}
+// Gnome drawing arguments made global, cause the sprite is drawn in
+// the context of an interruption.
+unsigned short *gnome_video_ptr;
+unsigned short *gnome_background_ptr;
 
 static void main_loop(unsigned short *video_ptr,
                       unsigned short *vback_ptr, // double buffer
@@ -100,14 +78,9 @@ static void main_loop(unsigned short *video_ptr,
   unsigned short old_clk = get_clock();
 #endif
 
-  g_video_ptr = video_ptr;
-  g_background_ptr = backsnow_ptr;
-  
   for (unsigned short i;; i++) {
     unsigned short clk = get_clock();
     unsigned short *tmp_ptr;
-
-    g_clk = clk;
 
 #ifdef USE_DOUBLE_BUFFER
     // Display buffer pointed at by video_ptr
@@ -123,8 +96,7 @@ static void main_loop(unsigned short *video_ptr,
     update_printer(text_buffer, clk);
     update_text(video_ptr, backsnow_ptr, asset_fonte, text_buffer, clk);
     update_snow(video_ptr, backsnow_ptr, background_ptr, clk);
-
-    //update_sprite_proxy(video_ptr, backsnow_ptr, clk);
+    // Gnome sprite is updated during Timer A interrupt
 
     #ifdef SHOW_FPS
     frames_cnt += clk - old_clk;
@@ -137,6 +109,13 @@ static void main_loop(unsigned short *video_ptr,
     #endif
 
   }
+}
+
+void init_gnome(unsigned short* video_ptr, unsigned short* background_ptr) {
+  // Gnome context
+  gnome_video_ptr = video_ptr;
+  gnome_background_ptr = background_ptr;
+  init_sprite();
 }
 
 int main() {
@@ -168,7 +147,7 @@ int main() {
 
   init_font_mask(asset_fonte);
   init_snow();
-  init_sprite();
+  init_gnome(video_ptr, backsnow_buffer);
 
   // Start music and initialize clock
   Supexec(soundtrack_init);

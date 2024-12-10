@@ -9,7 +9,7 @@ FOOTER_HEIGHT = 10
 
 _init_sprite:
     movem.l     d0-d7/a0-a6,-(a7)
-    ; collect the palette data
+    move.w      #0, next_frame
 
     lea         garray,a6
     lea         gmskarray,a5
@@ -49,11 +49,11 @@ loop_msk_compute:
 _update_sprite:
 reg_cnt	equ	4*15
 	movem.l	d0-d7/a0-a6,-(a7)
-	move.w	(reg_cnt+14,a7),d1      ; clk (word)
-	move.l  (reg_cnt+8,a7),a5       ; background_ptr (address)
-	move.l	(reg_cnt+4,a7),a6       ; video_ptr (address)
+	move.l  _gnome_background_ptr,a5
+	move.l	_gnome_video_ptr,a6
 
 gnome_show:
+        move.w          next_frame,d1
 	and.w		#7,d1
 	lsl.w	  	#2,d1
 	lea			garray,a2      ; tableau des sprites
@@ -108,6 +108,7 @@ gnome_show:
         add.l   #160-(GNOME_NBLOCKS*8), a6
 	dbf 	d2, .footer_loop
 
+        addq.w  #1, next_frame
 
 	movem.l		(a7)+,d0-d7/a0-a6
 	rts
@@ -141,3 +142,5 @@ g4msk		ds.b 2450
 g5msk		ds.b 2450
 g6msk		ds.b 2450
 g7msk		ds.b 2450
+
+next_frame      ds.w    1
