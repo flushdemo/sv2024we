@@ -26,6 +26,8 @@
 #define FONT_FILE_SIZE (34 + FONT_SIZE*2) // 34 for Degas header
 #define MUSIC_BUFFER_SIZE 42500
 
+#define PALETTE_ADDR ((short *)(0xFF8240))
+
 // Misc
 #define GNOME_SPEED 5
 
@@ -60,9 +62,13 @@ static long sup_get_clock(void) { return *((long *)REG_FRCLOCK); }
 static unsigned short get_clock(void) { return (Supexec(sup_get_clock) & 0xffff) - clk_0; }
 static void init_clock(void) { clk_0 = get_clock(); }
 
+static unsigned short *g_video_ptr;
+static unsigned short *g_background_ptr;
+static unsigned short g_clk;
+
 static void update_sprite_proxy(unsigned short *video_ptr,
                                 unsigned short *background_ptr,
-                                unsigned clk) {
+                                unsigned short clk) {
   static unsigned short old_clk = 0;
   clk = clk / GNOME_SPEED;
 #ifdef GNOME_SMART_DRAWING
@@ -70,6 +76,17 @@ static void update_sprite_proxy(unsigned short *video_ptr,
 #endif
     update_sprite(video_ptr, background_ptr, clk);
   old_clk = clk;
+}
+
+void interrupt_draw_gnome() {
+  //update_sprite_proxy(g_video_ptr, g_background_ptr, g_clk);
+  for(short i=0; i<16; i++) {
+    *(PALETTE_ADDR+i) = 0x700;
+  }
+  for (short i=0; i<10; i++);
+  for(short i=0; i<16; i++) {
+    *(PALETTE_ADDR+i) = asset_palette[i];
+  }
 }
 
 static void main_loop(unsigned short *video_ptr,
@@ -83,9 +100,14 @@ static void main_loop(unsigned short *video_ptr,
   unsigned short old_clk = get_clock();
 #endif
 
+  g_video_ptr = video_ptr;
+  g_background_ptr = backsnow_ptr;
+  
   for (unsigned short i;; i++) {
     unsigned short clk = get_clock();
     unsigned short *tmp_ptr;
+
+    g_clk = clk;
 
 #ifdef USE_DOUBLE_BUFFER
     // Display buffer pointed at by video_ptr
@@ -101,7 +123,8 @@ static void main_loop(unsigned short *video_ptr,
     update_printer(text_buffer, clk);
     update_text(video_ptr, backsnow_ptr, asset_fonte, text_buffer, clk);
     update_snow(video_ptr, backsnow_ptr, background_ptr, clk);
-    update_sprite_proxy(video_ptr, backsnow_ptr, clk);
+
+    //update_sprite_proxy(video_ptr, backsnow_ptr, clk);
 
     #ifdef SHOW_FPS
     frames_cnt += clk - old_clk;
@@ -149,7 +172,8 @@ int main() {
 
   // Start music and initialize clock
   Supexec(soundtrack_init);
-  Supexec(set_music_player_vbl);
+  Supexec(set_sprite_timer);
+  Supexec(set_custom_vbl);
   init_clock();
 
   // Then main loop
