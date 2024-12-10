@@ -28,21 +28,6 @@
 
 #define PALETTE_ADDR ((short *)(0xFF8240))
 
-// Misc
-#define GNOME_SPEED 5
-
-struct degas_pic {
-  unsigned short resolution;
-  unsigned short palette[16];
-  unsigned short picture[SCREEN_SIZE];
-};
-
-struct degas_font {
-  unsigned short resolution;
-  unsigned short palette[16];
-  unsigned short picture[FONT_SIZE];
-};
-
 long (*soundtrack_vbl) (); // Soundtrack VBL function
 
 // Needed global for now
